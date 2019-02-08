@@ -129,7 +129,6 @@ protected:
   GaitInfo RemoveTransition(const GaitInfo& g) const;
 
 private:
-  FootDurations GetPhaseDurations() const;
   virtual GaitInfo GetGait(Gaits gait) const = 0;
 };
 
