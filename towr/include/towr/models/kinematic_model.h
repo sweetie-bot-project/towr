@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace towr {
 
+class BaseState;
+
 /**
  * @brief  Contains all the robot specific kinematic parameters.
  *
@@ -71,6 +73,13 @@ public:
   {
     return nominal_stance_;
   }
+
+  /**
+   * @brief  The xyz-position [m] of each foot in default stance in world frame.
+   * @param  base_pose Robot base position in world frame.
+   * @returns The vector from base to each foot expressed in the base frame.
+   */
+  virtual EEPos GetNominalStanceInWorld(const BaseState& base_pose) const;
 
   /**
    * @brief How far each foot can deviate from its nominal position.
