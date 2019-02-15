@@ -69,7 +69,7 @@ PhaseSpline::GetJacobianOfPosWrtDurations (double t_global) const
 {
   VectorXd dx_dT  = GetDerivativeOfPosWrtPhaseDuration(t_global);
   VectorXd xd     = GetPoint(t_global).v();
-  int current_phase = GetSegmentID(t_global, phase_durations_->GetPhaseDurations());
+  int current_phase = GetSegmentID(t_global);
 
   return phase_durations_->GetJacobianOfPos(current_phase, dx_dT, xd);
 }
@@ -78,7 +78,7 @@ Eigen::VectorXd
 PhaseSpline::GetDerivativeOfPosWrtPhaseDuration (double t_global) const
 {
   int poly_id; double t_local;
-  std::tie(poly_id, t_local) = GetLocalTime(t_global, GetPolyDurations());
+  std::tie(poly_id, t_local) = GetLocalTime(t_global);
 
   VectorXd vel  = GetPoint(t_global).v();
   VectorXd dxdT = cubic_polys_.at(poly_id).GetDerivativeOfPosWrtDuration(t_local);

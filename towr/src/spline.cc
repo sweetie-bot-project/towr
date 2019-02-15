@@ -65,14 +65,34 @@ Spline::GetSegmentID(double t_global, const VecTimes& durations)
    assert(false); // this should never be reached
 }
 
-std::pair<int,double>
-Spline::GetLocalTime (double t_global, const VecTimes& durations) const
+int
+Spline::GetSegmentID(double t_global) const
 {
-  int id = GetSegmentID(t_global, durations);
+  double eps = 1e-10; // double precision
+  assert(t_global >= 0.0);
+
+  double t = 0;
+  int i=0;
+  for (const auto& p : cubic_polys_) {
+    t += p.GetDuration();
+
+    if (t >= t_global-eps) // at junctions, returns previous spline (=)
+      return i;
+
+    i++;
+  }
+
+  assert(false); // this should never be reached
+}
+
+std::pair<int,double>
+Spline::GetLocalTime (double t_global) const
+{
+  int id = GetSegmentID(t_global);
 
   double t_local = t_global;
   for (int i=0; i<id; i++)
-    t_local -= durations.at(i);
+    t_local -= cubic_polys_.at(i).GetDuration();
 
   return std::make_pair(id, t_local);
 }
@@ -81,7 +101,7 @@ const State
 Spline::GetPoint(double t_global) const
 {
   int id; double t_local;
-  std::tie(id, t_local) = GetLocalTime(t_global, GetPolyDurations());
+  std::tie(id, t_local) = GetLocalTime(t_global);
 
   return GetPoint(id, t_local);
 }
@@ -118,8 +138,7 @@ Spline::GetPolyDurations() const
 double
 Spline::GetTotalTime() const
 {
-  auto v = GetPolyDurations();
-  return std::accumulate(v.begin(), v.end(), 0.0);
+  return std::accumulate(cubic_polys_.begin(), cubic_polys_.end(), 0.0, [](double t, VecPoly::const_reference p) -> double { return t + p.GetDuration(); }) ;
 }
 
 } /* namespace towr */

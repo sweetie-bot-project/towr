@@ -63,7 +63,7 @@ NodeSpline::Jacobian
 NodeSpline::GetJacobianWrtNodes (double t_global, Dx dxdt) const
 {
   int id; double t_local;
-  std::tie(id, t_local) = GetLocalTime(t_global, GetPolyDurations());
+  std::tie(id, t_local) = GetLocalTime(t_global);
 
   return GetJacobianWrtNodes(id, t_local, dxdt);
 }

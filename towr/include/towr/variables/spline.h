@@ -71,6 +71,19 @@ public:
   static int GetSegmentID(double t_global, const VecTimes& durations);
 
   /**
+   * @returns The segment (e.g. phase, polynomial) at time t_global.
+   * @param t_global  The global time in the spline.
+   */
+  int GetSegmentID(double t_global) const;
+
+  /**
+   * @brief How much time of the current segment has passed at t_global.
+   * @param t_global The global time [s] along the spline.
+   * @return The segment id and the time passed in this segment.
+   */
+  std::pair<int,double> GetLocalTime(double t_global) const;
+
+  /**
    * @returns The total time of the spline.
    */
   double GetTotalTime() const;
@@ -87,14 +100,6 @@ public:
 
 protected:
   VecPoly cubic_polys_; ///< the sequence of polynomials making up the spline.
-
-  /**
-   * @brief How much time of the current segment has passed at t_global.
-   * @param t_global The global time [s] along the spline.
-   * @param d The durations of each segment.
-   * @return The segment id and the time passed in this segment.
-   */
-  std::pair<int,double> GetLocalTime(double t_global, const VecTimes& d) const;
 
   /**
    * @brief Updates the cubic-Hermite polynomial coefficients using the
