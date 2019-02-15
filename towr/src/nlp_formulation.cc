@@ -128,6 +128,11 @@ std::vector<NodesVariablesPhaseBased::Ptr>
 NlpFormulation::MakeEndeffectorVariables () const
 {
   std::vector<NodesVariablesPhaseBased::Ptr> vars;
+   
+  // coordinate transform to calculate nominal EE positions 
+  double yaw = final_base_.ang.p().z();
+  Eigen::Vector3d euler(0.0, 0.0, yaw);
+  Eigen::Matrix3d w_R_b = EulerConverter::GetRotationMatrixBaseToWorld(euler);
 
   // Endeffector Motions
   double T = params_.GetTotalTime();
@@ -138,17 +143,30 @@ NlpFormulation::MakeEndeffectorVariables () const
                                               id::EEMotionNodes(ee),
                                               params_.ee_polynomials_per_swing_phase_);
 
+    // set final position
+    Vector3d final_ee_W;
+    if (final_ee_W_.size() == 0) {
+      // use nominal final position
+      final_ee_W = final_base_.lin.p() + w_R_b*model_.kinematic_model_->GetNominalStanceInBase().at(ee);
+    }
+    else {
+      // use user-provided final position
+      final_ee_W = final_ee_W_.at(ee);
+	}
+    // check if leg is in contact at finish
+    bool ee_in_contact_at_finish = params_.ee_in_contact_at_start_.at(ee);
+    if (params_.ee_phase_durations_.at(ee).size() % 2 == 0) ee_in_contact_at_finish = ! ee_in_contact_at_finish;
+    if (ee_in_contact_at_finish) {
+      // assign z to terrain level
+      final_ee_W.z() = terrain_->GetHeight(final_ee_W.x(), final_ee_W.z());
+    }
     // initialize towards final footholds
-    double yaw = final_base_.ang.p().z();
-    Eigen::Vector3d euler(0.0, 0.0, yaw);
-    Eigen::Matrix3d w_R_b = EulerConverter::GetRotationMatrixBaseToWorld(euler);
-    Vector3d final_ee_pos_W = final_base_.lin.p() + w_R_b*model_.kinematic_model_->GetNominalStanceInBase().at(ee);
-    double x = final_ee_pos_W.x();
-    double y = final_ee_pos_W.y();
-    double z = terrain_->GetHeight(x,y);
-    nodes->SetByLinearInterpolation(initial_ee_W_.at(ee), Vector3d(x,y,z), T);
-
+    nodes->SetByLinearInterpolation(initial_ee_W_.at(ee), final_ee_W, T);
     nodes->AddStartBound(kPos, {X,Y,Z}, initial_ee_W_.at(ee));
+    nodes->AddStartBound(kVel, {X,Y,Z}, Vector3d::Zero());
+    nodes->AddFinalBound(kPos, params_.ee_bounds_final_lin_pos_, final_ee_W);
+    nodes->AddFinalBound(kVel, params_.ee_bounds_final_lin_vel_, Vector3d::Zero());
+
     vars.push_back(nodes);
   }
 
