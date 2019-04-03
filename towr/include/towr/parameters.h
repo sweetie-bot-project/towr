@@ -206,8 +206,8 @@ public:
 	     bounds_final_ang_vel_;
 
   /// which dimensions (x,y,z) of the final end effectors' state should be bounded
-  std::vector<int> ee_bounds_final_lin_pos_,
-                   ee_bounds_final_lin_vel_;
+  std::vector<DimSet> ee_bounds_final_lin_pos_,
+                      ee_bounds_final_lin_vel_;
 
   /** Minimum and maximum time [s] for each phase (swing,stance).
    *

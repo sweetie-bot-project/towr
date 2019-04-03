@@ -162,10 +162,16 @@ NlpFormulation::MakeEndeffectorVariables () const
     }
     // initialize towards final footholds
     nodes->SetByLinearInterpolation(initial_ee_W_.at(ee), final_ee_W, T);
+	// add start bounds
     nodes->AddStartBound(kPos, {X,Y,Z}, initial_ee_W_.at(ee));
     nodes->AddStartBound(kVel, {X,Y,Z}, Vector3d::Zero());
-    nodes->AddFinalBound(kPos, params_.ee_bounds_final_lin_pos_, final_ee_W);
-    nodes->AddFinalBound(kVel, params_.ee_bounds_final_lin_vel_, Vector3d::Zero());
+	// add final bounds only if they are provided in Parameters structure
+    if (params_.ee_bounds_final_lin_pos_.size() != 0) {
+		nodes->AddFinalBound(kPos, params_.ee_bounds_final_lin_pos_.at(ee), final_ee_W);
+	}
+    if (params_.ee_bounds_final_lin_vel_.size() != 0) {
+		nodes->AddFinalBound(kVel, params_.ee_bounds_final_lin_vel_.at(ee), Vector3d::Zero());
+	}
 
     vars.push_back(nodes);
   }
