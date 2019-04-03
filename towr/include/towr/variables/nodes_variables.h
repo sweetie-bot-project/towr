@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ifopt/variable_set.h>
 
+#include "cartesian_dimensions.h"
 #include "state.h"
 #include "nodes_observer.h"
 
@@ -191,7 +192,7 @@ public:
    * @param dimensions Which dimensions (x,y,z) should be restricted.
    * @param val The values the fist node should be set to.
    */
-  void AddStartBound (Dx deriv, const std::vector<int>& dimensions,
+  void AddStartBound (Dx deriv, const DimSet& dimensions,
                       const VectorXd& val);
 
   /**
@@ -200,7 +201,7 @@ public:
    * @param dimensions Which dimensions (x,y,z) should be restricted.
    * @param val The values the last node should be set to.
    */
-  void AddFinalBound(Dx deriv, const std::vector<int>& dimensions,
+  void AddFinalBound(Dx deriv, const DimSet& dimensions,
                      const VectorXd& val);
 
 protected:
@@ -229,7 +230,7 @@ private:
    * @param dim      The dimension of the node to bound.
    * @param values   The values to set the bounds to.
    */
-  void AddBounds(int node_id, Dx deriv, const std::vector<int>& dim,
+  void AddBounds(int node_id, Dx deriv, const DimSet& dim,
                  const VectorXd& values);
   /**
    * @brief Restricts a specific optimization variables.
