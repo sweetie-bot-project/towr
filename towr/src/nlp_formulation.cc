@@ -158,7 +158,7 @@ NlpFormulation::MakeEndeffectorVariables () const
     if (params_.ee_phase_durations_.at(ee).size() % 2 == 0) ee_in_contact_at_finish = ! ee_in_contact_at_finish;
     if (ee_in_contact_at_finish) {
       // assign z to terrain level
-      final_ee_W.z() = terrain_->GetHeight(final_ee_W.x(), final_ee_W.z());
+      final_ee_W.z() = terrain_->GetHeight(final_ee_W.x(), final_ee_W.y());
     }
     // initialize towards final footholds
     nodes->SetByLinearInterpolation(initial_ee_W_.at(ee), final_ee_W, T);
