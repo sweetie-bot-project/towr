@@ -151,7 +151,7 @@ NodesVariables::SetByLinearInterpolation(const VectorXd& initial_val,
 
 void
 NodesVariables::AddBounds(int node_id, Dx deriv,
-                 const std::vector<int>& dimensions,
+                 const DimSet& dimensions,
                  const VectorXd& val)
 {
   for (auto dim : dimensions)
@@ -168,13 +168,13 @@ NodesVariables::AddBound (const NodeValueInfo& nvi_des, double val)
 }
 
 void
-NodesVariables::AddStartBound (Dx d, const std::vector<int>& dimensions, const VectorXd& val)
+NodesVariables::AddStartBound (Dx d, const DimSet& dimensions, const VectorXd& val)
 {
   AddBounds(0, d, dimensions, val);
 }
 
 void
-NodesVariables::AddFinalBound (Dx deriv, const std::vector<int>& dimensions,
+NodesVariables::AddFinalBound (Dx deriv, const DimSet& dimensions,
                       const VectorXd& val)
 {
   AddBounds(nodes_.size()-1, deriv, dimensions, val);
