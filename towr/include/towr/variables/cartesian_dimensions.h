@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TOWR_VARIABLES_CARTESIAN_DIMENSIONS_H_
 
 #include <cassert>
+#include <vector>
 
 namespace towr {
 
@@ -58,6 +59,9 @@ static Dim2D To2D(Dim3D dim)
 static constexpr int k6D = 6; // X,Y,Z, roll, pitch, yaw
 enum Dim6D { AX=0, AY, AZ, LX, LY, LZ };
 static const Dim6D AllDim6D[] = {AX, AY, AZ, LX, LY, LZ};
+
+// The set of dimensions
+using DimSet = std::vector<int>;
 
 } // namespace towr
 
