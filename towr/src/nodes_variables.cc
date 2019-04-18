@@ -117,7 +117,7 @@ NodesVariables::GetBounds () const
   return bounds_;
 }
 
-const std::vector<Node>
+const std::vector<Node>&
 NodesVariables::GetNodes() const
 {
   return nodes_;

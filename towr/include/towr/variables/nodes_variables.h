@@ -145,7 +145,7 @@ public:
   /**
    * @returns All the nodes that can be used to reconstruct the spline.
    */
-  const std::vector<Node> GetNodes() const;
+  const std::vector<Node>& GetNodes() const;
 
   /**
    * @returns the number of polynomials that can be built with these nodes.
