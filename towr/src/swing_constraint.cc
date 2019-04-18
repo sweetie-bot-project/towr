@@ -43,7 +43,12 @@ towr::SwingConstraint::InitVariableDependedQuantities (const VariablesPtr& x)
 {
   ee_motion_ = x->GetComponent<NodesVariablesPhaseBased>(ee_motion_id_);
 
+  // form swing nodes id list: get all no-constant nodes and exclude first and last spline node if necessary
   pure_swing_node_ids_ = ee_motion_->GetIndicesOfNonConstantNodes();
+  if (pure_swing_node_ids_.size() > 0) {
+	  if (pure_swing_node_ids_.front() == 0) pure_swing_node_ids_.erase(pure_swing_node_ids_.begin());
+	  if (pure_swing_node_ids_.back()+1 == ee_motion_->GetNodes().size()) pure_swing_node_ids_.pop_back();
+  }
 
   // constrain xy position and velocity of every swing node
   int constraint_count =  pure_swing_node_ids_.size()*Node::n_derivatives*k2D;
