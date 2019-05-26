@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TOWR_TOWR_ROS_INCLUDE_TOWR_ROS_HYQ_MODEL_H_
 #define TOWR_TOWR_ROS_INCLUDE_TOWR_ROS_HYQ_MODEL_H_
 
-#include <towr/models/kinematic_model.h>
+#include <towr/models/simple_kinematic_model.h>
 #include <towr/models/single_rigid_body_dynamics.h>
 #include <towr/models/endeffector_mappings.h>
 
@@ -39,9 +39,9 @@ namespace towr {
 /**
  * @brief The Kinematics of the quadruped robot HyQ.
  */
-class HyqKinematicModel : public KinematicModel {
+class HyqKinematicModel : public SimpleKinematicModel {
 public:
-  HyqKinematicModel () : KinematicModel(4)
+  HyqKinematicModel () : SimpleKinematicModel(4)
   {
     const double x_nominal_b = 0.31;
     const double y_nominal_b = 0.29;

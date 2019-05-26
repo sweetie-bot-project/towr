@@ -76,9 +76,8 @@ private:
   EulerConverter base_angular_; ///< the orientation of the base.
   NodeSpline::Ptr ee_motion_;       ///< the linear position of the endeffectors.
 
-  Eigen::Vector3d max_deviation_from_nominal_;
-  Eigen::Vector3d nominal_ee_pos_B_;
-  EE ee_;
+  Eigen::AlignedBox3d ee_bounding_box_B_; ///< bounding box for end effector position in base frame
+  EE ee_; ///< index of end effector assotiated with constraint
 
   // see TimeDiscretizationConstraint for documentation
   void UpdateConstraintAtInstance (double t, int k, VectorXd& g) const override;

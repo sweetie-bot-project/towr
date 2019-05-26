@@ -46,7 +46,10 @@ public:
    */
   void SetTowrInitialState() override
   {
-    auto nominal_stance_B = formulation_.model_.kinematic_model_->GetNominalStanceInBase();
+	int n_ee = formulation_.model_.kinematic_model_->GetNumberOfEndeffectors();
+	NlpFormulation::EEPos nominal_stance_B;
+	nominal_stance_B.reserve(n_ee);
+	for(int ee = 0; ee < n_ee; ee++) nominal_stance_B.push_back( formulation_.model_.kinematic_model_->GetNominalStanceInBase(ee) );
 
     double z_ground = 0.0;
     formulation_.initial_ee_W_ =  nominal_stance_B;

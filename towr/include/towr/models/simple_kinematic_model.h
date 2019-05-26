@@ -27,65 +27,63 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef TOWR_MODELS_KINEMATIC_MODEL_H_
-#define TOWR_MODELS_KINEMATIC_MODEL_H_
+#ifndef TOWR_MODELS_SIMPLE_KINEMATIC_MODEL_H_
+#define TOWR_MODELS_SIMPLE_KINEMATIC_MODEL_H_
 
-#include <memory>
-#include <vector>
-
-#include <Eigen/Dense>
-
-#include <towr/variables/sphere.h>
+#include <towr/models/kinematic_model.h>
 
 namespace towr {
 
 /**
- * @brief Contains all the robot specific kinematic parameters.
+ * @brief Simplified kinematic model in form of bounding box.
  *
- * This class is mainly used to formulate the @ref RangeOfMotionConstraint,
- * restricting each endeffector to stay inside it's kinematic range. 
- * The inposed restrictions include parallelepiped (bounding box) and ball 
- * with center in robot shoulder.
+ * The dimentions of bounding boxes are the same for all end effectors.
+ * Nominal pose is always in the senter of bounding box.
  *
  * @ingroup Robots
  */
-class KinematicModel {
+class SimpleKinematicModel : public KinematicModel {
+protected:
+  // partial initaliztion for use in derived classes
+  SimpleKinematicModel(int n_ee) {
+    nominal_stance_.resize(n_ee); 
+  }
+
 public:
-  using Ptr      = std::shared_ptr<KinematicModel>;
-  using EEPos    = std::vector<Eigen::Vector3d>;
-  using Vector3d = Eigen::Vector3d;
-  using Box3d    = Eigen::AlignedBox3d;
-  using EE       = unsigned int;
+  // fully initialized Kinematic model
+  SimpleKinematicModel(const EEPos& nominal_stance, const Vector3d& max_dev_from_nominal) :
+	  nominal_stance_(nominal_stance), max_dev_from_nominal_(max_dev_from_nominal) 
+  {}
 
-  virtual ~KinematicModel () = default;
+  virtual ~SimpleKinematicModel () = default;
 
-  /**
-   * @brief  The xyz-position [m] of foot in default stance.
-   * @param ee End effector index.
-   * @returns The foot pose expressed in the base frame.
-   */
-  virtual Vector3d GetNominalStanceInBase(EE ee) const = 0;
+  // additional getter for backward compatibility
+  Vector3d GetMaximumDeviationFromNominal() const {
+    return max_dev_from_nominal_;
+  }
 
-  /**
-   * @brief Get foot bounding box. 
-   * @param ee End effector index.
-   * @returns Pair of points which represent lower (first element) and upper (second element) bounds for end effector pose.
-   */
-  virtual Box3d GetBoundingBox(EE ee) const = 0;
+  // kinematic model interface
+  Vector3d GetNominalStanceInBase(EE ee) const { 
+    return nominal_stance_.at(ee); 
+  }
 
-  /**
-   * @brief Get foot bounding sphere for the foot.
-   * @param ee End effector index.
-   * @return The center and raius of ball which restricts foot movements.
-   */
-  virtual Sphere3d GetBoundingBall(EE ee) const = 0;
+  Box3d GetBoundingBox(EE ee) const { 
+    return Box3d(nominal_stance_.at(ee) - max_dev_from_nominal_, nominal_stance_.at(ee) + max_dev_from_nominal_); 
+  }
 
-  /**
-   * @returns returns the number of endeffectors of this robot.
-   */
-  virtual int GetNumberOfEndeffectors() const = 0;
+  virtual Sphere3d GetBoundingBall(EE ee) const {
+    return Sphere3d(Vector3d::Zero(), 0.0); 
+  }
+
+  virtual int GetNumberOfEndeffectors() const {
+    return nominal_stance_.size();
+  }
+
+  protected:
+    EEPos nominal_stance_;
+    Vector3d max_dev_from_nominal_;
 };
 
 } /* namespace towr */
 
-#endif /* TOWR_MODELS_KINEMATIC_MODEL_H_ */
+#endif /* TOWR_MODELS_SIMPLE_KINEMATIC_MODEL_H_ */

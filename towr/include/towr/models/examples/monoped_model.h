@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TOWR_TOWR_ROS_INCLUDE_TOWR_ROS_MONOPED_MODEL_H_
 #define TOWR_TOWR_ROS_INCLUDE_TOWR_ROS_MONOPED_MODEL_H_
 
-#include <towr/models/kinematic_model.h>
+#include <towr/models/simple_kinematic_model.h>
 #include <towr/models/single_rigid_body_dynamics.h>
 
 namespace towr {
@@ -38,9 +38,9 @@ namespace towr {
 /**
  * @brief The Kinematics of a one-legged hopper with HyQ leg.
  */
-class MonopedKinematicModel : public KinematicModel {
+class MonopedKinematicModel : public SimpleKinematicModel {
 public:
-  MonopedKinematicModel () : KinematicModel(1)
+  MonopedKinematicModel () : SimpleKinematicModel(1)
   {
     nominal_stance_.at(0) = Eigen::Vector3d( 0.0, 0.0, -0.58);
     max_dev_from_nominal_ << 0.25, 0.15, 0.2;

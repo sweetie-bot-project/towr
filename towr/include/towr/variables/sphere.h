@@ -27,65 +27,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef TOWR_MODELS_KINEMATIC_MODEL_H_
-#define TOWR_MODELS_KINEMATIC_MODEL_H_
-
-#include <memory>
-#include <vector>
+#ifndef TOWR_VARIABLES_SPHERE_H_
+#define TOWR_VARIABLES_SPHERE_H_
 
 #include <Eigen/Dense>
-
-#include <towr/variables/sphere.h>
 
 namespace towr {
 
 /**
- * @brief Contains all the robot specific kinematic parameters.
- *
- * This class is mainly used to formulate the @ref RangeOfMotionConstraint,
- * restricting each endeffector to stay inside it's kinematic range. 
- * The inposed restrictions include parallelepiped (bounding box) and ball 
- * with center in robot shoulder.
- *
- * @ingroup Robots
- */
-class KinematicModel {
-public:
-  using Ptr      = std::shared_ptr<KinematicModel>;
-  using EEPos    = std::vector<Eigen::Vector3d>;
-  using Vector3d = Eigen::Vector3d;
-  using Box3d    = Eigen::AlignedBox3d;
-  using EE       = unsigned int;
+ * @brief Sphere in 3d sapce. This class mimics Eigen::AlignedBox.
+ * Sphere can be used to impose kinematic constraints.
+ **/
+class Sphere3d {
+  public:
+    using Vector3d = Eigen::Vector3d;
 
-  virtual ~KinematicModel () = default;
-
-  /**
-   * @brief  The xyz-position [m] of foot in default stance.
-   * @param ee End effector index.
-   * @returns The foot pose expressed in the base frame.
-   */
-  virtual Vector3d GetNominalStanceInBase(EE ee) const = 0;
-
-  /**
-   * @brief Get foot bounding box. 
-   * @param ee End effector index.
-   * @returns Pair of points which represent lower (first element) and upper (second element) bounds for end effector pose.
-   */
-  virtual Box3d GetBoundingBox(EE ee) const = 0;
-
-  /**
-   * @brief Get foot bounding sphere for the foot.
-   * @param ee End effector index.
-   * @return The center and raius of ball which restricts foot movements.
-   */
-  virtual Sphere3d GetBoundingBall(EE ee) const = 0;
-
-  /**
-   * @returns returns the number of endeffectors of this robot.
-   */
-  virtual int GetNumberOfEndeffectors() const = 0;
+  public:
+    Sphere3d() {}
+    Sphere3d(const Vector3d center, double radius) : center_(center), radius_(radius) {}
+    Sphere3d(const Sphere3d& s) = default;
+  
+    const Vector3d& center() const { return center_; }
+    Vector3d center() { return center_; }
+    double radius() const { return radius_; };
+    double& radius() { return radius_; };
+  
+    bool contains(const Vector3d& p) const { return (p - center_).norm() <= radius_; };
+  
+  protected:
+    Vector3d center_;
+    double radius_;
 };
 
 } /* namespace towr */
 
-#endif /* TOWR_MODELS_KINEMATIC_MODEL_H_ */
+#endif /* TOWR_VARIABLES_SPHERE_H_ */

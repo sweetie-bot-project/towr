@@ -103,7 +103,7 @@ NlpFormulation::MakeBaseVariables () const
 
   double x = final_base_.lin.p().x();
   double y = final_base_.lin.p().y();
-  double z = terrain_->GetHeight(x,y) - model_.kinematic_model_->GetNominalStanceInBase().front().z();
+  double z = terrain_->GetHeight(x,y) - model_.kinematic_model_->GetNominalStanceInBase(0).z();
   Vector3d final_pos(x, y, z);
 
   spline_lin->SetByLinearInterpolation(initial_base_.lin.p(), final_pos, params_.GetTotalTime());
@@ -147,7 +147,7 @@ NlpFormulation::MakeEndeffectorVariables () const
     Vector3d final_ee_W;
     if (final_ee_W_.size() == 0) {
       // use nominal final position
-      final_ee_W = final_base_.lin.p() + w_R_b*model_.kinematic_model_->GetNominalStanceInBase().at(ee);
+      final_ee_W = final_base_.lin.p() + w_R_b*model_.kinematic_model_->GetNominalStanceInBase(ee);
     }
     else {
       // use user-provided final position

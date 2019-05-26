@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <towr/terrain/height_map.h>
 #include <towr/variables/euler_converter.h>
+#include <towr/models/simple_kinematic_model.h>
 #include <towr_ros/topic_names.h>
 #include <towr_ros/towr_xpp_ee_map.h>
 
@@ -200,13 +201,12 @@ xpp_msgs::RobotParameters
 TowrRosInterface::BuildRobotParametersMsg(const RobotModel& model) const
 {
   xpp_msgs::RobotParameters params_msg;
-  auto max_dev_xyz = model.kinematic_model_->GetMaximumDeviationFromNominal();
+  auto max_dev_xyz = std::dynamic_pointer_cast<towr::SimpleKinematicModel>(model.kinematic_model_)->GetMaximumDeviationFromNominal();
   params_msg.ee_max_dev = xpp::Convert::ToRos<geometry_msgs::Vector3>(max_dev_xyz);
 
-  auto nominal_B = model.kinematic_model_->GetNominalStanceInBase();
-  int n_ee = nominal_B.size();
+  int n_ee = model.kinematic_model_->GetNumberOfEndeffectors();
   for (int ee_towr=0; ee_towr<n_ee; ++ee_towr) {
-    Vector3d pos = nominal_B.at(ee_towr);
+    Vector3d pos = model.kinematic_model_->GetNominalStanceInBase(ee_towr);
     params_msg.nominal_ee_pos.push_back(xpp::Convert::ToRos<geometry_msgs::Point>(pos));
     params_msg.ee_names.push_back(ToXppEndeffector(n_ee, ee_towr).second);
   }
