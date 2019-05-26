@@ -27,6 +27,7 @@ add_library(${PROJECT_NAME} SHARED
   src/phase_durations.cc
   # models
   src/robot_model.cc
+  src/general_kinematic_model.cc
   src/dynamic_model.cc
   src/single_rigid_body_dynamics.cc
   # constraints
