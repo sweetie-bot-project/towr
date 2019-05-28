@@ -274,7 +274,7 @@ NlpFormulation::MakeRangeOfMotionBoxConstraint (const SplineHolder& s) const
   ContraintPtrVec c;
 
   for (int ee=0; ee<params_.GetEECount(); ee++) {
-    auto rom = std::make_shared<RangeOfMotionConstraint>(model_.kinematic_model_,
+    auto rom = std::make_shared<RangeOfMotionConstraint>(model_.kinematic_model_->GetBoundingBox(ee),
                                                          params_.GetTotalTime(),
                                                          params_.dt_constraint_range_of_motion_,
                                                          ee,

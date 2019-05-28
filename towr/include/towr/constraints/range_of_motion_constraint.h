@@ -34,8 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <towr/variables/spline_holder.h>
 #include <towr/variables/euler_converter.h>
 
-#include <towr/models/kinematic_model.h>
-
 #include "time_discretization_constraint.h"
 
 namespace towr {
@@ -56,16 +54,17 @@ class RangeOfMotionConstraint : public TimeDiscretizationConstraint {
 public:
   using EE = uint;
   using Vector3d = Eigen::Vector3d;
+  using AlignedBox3d = Eigen::AlignedBox3d;
 
   /**
    * @brief Constructs a constraint instance.
-   * @param robot_model   The kinematic restrictions of the robot.
+   * @param box   The kinematic restrictions of the robot.
    * @param T   The total duration of the optimization.
    * @param dt  the discretization intervall at which to enforce constraints.
    * @param ee            The endeffector for which to constrain the range.
    * @param spline_holder Pointer to the current variables.
    */
-  RangeOfMotionConstraint(const KinematicModel::Ptr& robot_model,
+  RangeOfMotionConstraint(const AlignedBox3d& box,
                           double T, double dt,
                           const EE& ee,
                           const SplineHolder& spline_holder);

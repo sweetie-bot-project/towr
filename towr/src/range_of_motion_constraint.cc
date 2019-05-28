@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace towr {
 
-RangeOfMotionConstraint::RangeOfMotionConstraint (const KinematicModel::Ptr& model,
+RangeOfMotionConstraint::RangeOfMotionConstraint (const AlignedBox3d& box,
                                                   double T, double dt,
                                                   const EE& ee,
                                                   const SplineHolder& spline_holder)
@@ -42,7 +42,7 @@ RangeOfMotionConstraint::RangeOfMotionConstraint (const KinematicModel::Ptr& mod
   base_angular_ = EulerConverter(spline_holder.base_angular_);
   ee_motion_    = spline_holder.ee_motion_.at(ee);
 
-  ee_bounding_box_B_          = model->GetBoundingBox(ee);
+  ee_bounding_box_B_ = box;
   ee_ = ee;
 
   SetRows(GetNumberOfNodes()*k3D);
