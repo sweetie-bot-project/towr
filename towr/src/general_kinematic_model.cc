@@ -10,7 +10,7 @@ GeneralKinematicModel::GeneralKinematicModel(int n_ee)
 	bounding_sphere_.resize(n_ee);
 }
 
-void GeneralKinematicModel::configureEndEffector(EE ee, const Vector3d& nominal_stance, const Box3d& bounding_box, const Sphere3d& bounding_sphere)
+void GeneralKinematicModel::configureEndEffector(EE ee, const Vector3d& nominal_stance, const AlignedBox3d& bounding_box, const Sphere3d& bounding_sphere)
 {
 	int n_ee = nominal_stance_.size();
 	if (ee >= n_ee) throw std::out_of_range("invalid end effector number");

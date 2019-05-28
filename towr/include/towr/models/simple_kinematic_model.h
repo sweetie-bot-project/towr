@@ -67,8 +67,8 @@ public:
     return nominal_stance_.at(ee); 
   }
 
-  Box3d GetBoundingBox(EE ee) const { 
-    return Box3d(nominal_stance_.at(ee) - max_dev_from_nominal_, nominal_stance_.at(ee) + max_dev_from_nominal_); 
+  AlignedBox3d GetBoundingBox(EE ee) const { 
+    return AlignedBox3d(nominal_stance_.at(ee) - max_dev_from_nominal_, nominal_stance_.at(ee) + max_dev_from_nominal_); 
   }
 
   virtual Sphere3d GetBoundingBall(EE ee) const {

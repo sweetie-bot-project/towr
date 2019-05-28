@@ -58,7 +58,7 @@ public:
    * @param bounding_box Range restrictions in form of parallelepiped (Eigen::AlignedBox) in base frame.
    * @param bounding_sphere Range restrictions in form of sphere (Eigen::AlignedBox) in base frame.
    **/
-  void configureEndEffector(EE ee, const Vector3d& nominal_stance, const Box3d& bounding_box, const Sphere3d& bounding_sphere); 
+  void configureEndEffector(EE ee, const Vector3d& nominal_stance, const AlignedBox3d& bounding_box, const Sphere3d& bounding_sphere); 
 
   /**
    * @brief Return true if all end effector were configured.
@@ -73,7 +73,7 @@ public:
     return nominal_stance_.at(ee);
   }
 
-  virtual Box3d GetBoundingBox(EE ee) const {
+  virtual AlignedBox3d GetBoundingBox(EE ee) const {
     return bounding_box_.at(ee);
   }
 
@@ -88,7 +88,7 @@ public:
 protected:
   std::bitset<max_number_of_legs_> configured_legs_;
   std::vector<Vector3d> nominal_stance_;
-  std::vector<Box3d> bounding_box_;
+  std::vector<AlignedBox3d> bounding_box_;
   std::vector<Sphere3d> bounding_sphere_;
 };
 

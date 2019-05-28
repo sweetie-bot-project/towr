@@ -54,7 +54,7 @@ public:
   using Ptr      = std::shared_ptr<KinematicModel>;
   using EEPos    = std::vector<Eigen::Vector3d>;
   using Vector3d = Eigen::Vector3d;
-  using Box3d    = Eigen::AlignedBox3d;
+  using AlignedBox3d    = Eigen::AlignedBox3d;
   using EE       = unsigned int;
 
   virtual ~KinematicModel () = default;
@@ -71,7 +71,7 @@ public:
    * @param ee End effector index.
    * @returns Pair of points which represent lower (first element) and upper (second element) bounds for end effector pose.
    */
-  virtual Box3d GetBoundingBox(EE ee) const = 0;
+  virtual AlignedBox3d GetBoundingBox(EE ee) const = 0;
 
   /**
    * @brief Get foot bounding sphere for the foot.
