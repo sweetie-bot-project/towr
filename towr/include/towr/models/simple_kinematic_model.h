@@ -71,7 +71,7 @@ public:
     return AlignedBox3d(nominal_stance_.at(ee) - max_dev_from_nominal_, nominal_stance_.at(ee) + max_dev_from_nominal_); 
   }
 
-  virtual Sphere3d GetBoundingBall(EE ee) const {
+  virtual Sphere3d GetBoundingSphere(EE ee) const {
     return Sphere3d(Vector3d::Zero(), 0.0); 
   }
 

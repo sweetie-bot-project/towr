@@ -77,7 +77,7 @@ public:
     return bounding_box_.at(ee);
   }
 
-  virtual Sphere3d GetBoundingBall(EE ee) const {
+  virtual Sphere3d GetBoundingSphere(EE ee) const {
     return bounding_sphere_.at(ee);
   }
 

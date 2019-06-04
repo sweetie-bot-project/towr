@@ -78,7 +78,7 @@ public:
    * @param ee End effector index.
    * @return The center and raius of ball which restricts foot movements.
    */
-  virtual Sphere3d GetBoundingBall(EE ee) const = 0;
+  virtual Sphere3d GetBoundingSphere(EE ee) const = 0;
 
   /**
    * @returns returns the number of endeffectors of this robot.
