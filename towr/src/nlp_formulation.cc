@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <towr/constraints/dynamic_constraint.h>
 #include <towr/constraints/force_constraint.h>
 #include <towr/constraints/range_of_motion_constraint.h>
+#include <towr/constraints/range_of_motion_spherical_constraint.h>
 #include <towr/constraints/swing_constraint.h>
 #include <towr/constraints/terrain_constraint.h>
 #include <towr/constraints/total_duration_constraint.h>
@@ -237,14 +238,15 @@ NlpFormulation::GetConstraint (Parameters::ConstraintName name,
                            const SplineHolder& s) const
 {
   switch (name) {
-    case Parameters::Dynamic:        return MakeDynamicConstraint(s);
-    case Parameters::EndeffectorRom: return MakeRangeOfMotionBoxConstraint(s);
-    case Parameters::BaseRom:        return MakeBaseRangeOfMotionConstraint(s);
-    case Parameters::TotalTime:      return MakeTotalTimeConstraint();
-    case Parameters::Terrain:        return MakeTerrainConstraint();
-    case Parameters::Force:          return MakeForceConstraint();
-    case Parameters::Swing:          return MakeSwingConstraint();
-    case Parameters::BaseAcc:        return MakeBaseAccConstraint(s);
+    case Parameters::Dynamic:                 return MakeDynamicConstraint(s);
+    case Parameters::EndeffectorBoxRom:       return MakeRangeOfMotionBoxConstraint(s);
+    case Parameters::EndeffectorSphericalRom: return MakeRangeOfMotionSphericalConstraint(s);
+    case Parameters::BaseRom:                 return MakeBaseRangeOfMotionConstraint(s);
+    case Parameters::TotalTime:               return MakeTotalTimeConstraint();
+    case Parameters::Terrain:                 return MakeTerrainConstraint();
+    case Parameters::Force:                   return MakeForceConstraint();
+    case Parameters::Swing:                   return MakeSwingConstraint();
+    case Parameters::BaseAcc:                 return MakeBaseAccConstraint(s);
     default: throw std::runtime_error("constraint not defined!");
   }
 }
@@ -275,6 +277,24 @@ NlpFormulation::MakeRangeOfMotionBoxConstraint (const SplineHolder& s) const
 
   for (int ee=0; ee<params_.GetEECount(); ee++) {
     auto rom = std::make_shared<RangeOfMotionConstraint>(model_.kinematic_model_->GetBoundingBox(ee),
+                                                         params_.GetTotalTime(),
+                                                         params_.dt_constraint_range_of_motion_,
+                                                         ee,
+                                                         s);
+    c.push_back(rom);
+  }
+
+  return c;
+}
+
+NlpFormulation::ContraintPtrVec
+NlpFormulation::MakeRangeOfMotionSphericalConstraint (const SplineHolder& s) const
+{
+  ContraintPtrVec c;
+
+  for (int ee=0; ee<params_.GetEECount(); ee++) {
+    auto rom = std::make_shared<RangeOfMotionSphericalConstraint>(model_.kinematic_model_->GetBoundingBox(ee),
+                                                         model_.kinematic_model_->GetBoundingSphere(ee),
                                                          params_.GetTotalTime(),
                                                          params_.dt_constraint_range_of_motion_,
                                                          ee,
