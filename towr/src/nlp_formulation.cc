@@ -239,7 +239,7 @@ NlpFormulation::GetConstraint (Parameters::ConstraintName name,
 {
   switch (name) {
     case Parameters::Dynamic:                 return MakeDynamicConstraint(s);
-    case Parameters::EndeffectorBoxRom:       return MakeRangeOfMotionBoxConstraint(s);
+    case Parameters::EndeffectorRom:          return MakeRangeOfMotionConstraint(s);
     case Parameters::EndeffectorSphericalRom: return MakeRangeOfMotionSphericalConstraint(s);
     case Parameters::BaseRom:                 return MakeBaseRangeOfMotionConstraint(s);
     case Parameters::TotalTime:               return MakeTotalTimeConstraint();
@@ -271,16 +271,25 @@ NlpFormulation::MakeDynamicConstraint(const SplineHolder& s) const
 }
 
 NlpFormulation::ContraintPtrVec
-NlpFormulation::MakeRangeOfMotionBoxConstraint (const SplineHolder& s) const
+NlpFormulation::MakeRangeOfMotionConstraint (const SplineHolder& s) const
 {
   ContraintPtrVec c;
 
   for (int ee=0; ee<params_.GetEECount(); ee++) {
-    auto rom = std::make_shared<RangeOfMotionConstraint>(model_.kinematic_model_->GetBoundingBox(ee),
-                                                         params_.GetTotalTime(),
-                                                         params_.dt_constraint_range_of_motion_,
-                                                         ee,
-                                                         s);
+    ContraintPtr rom;
+
+	KinematicModel::AlignedBox3d box = model_.kinematic_model_->GetBoundingBox(ee);
+	Sphere3d sphere = model_.kinematic_model_->GetBoundingSphere(ee);
+
+    // check if bounding box is inside bounding sphere
+    if ( sphere.contains(box.min()) && sphere.contains(box.max()) ) {
+	  // use simplified constraint without sphere
+      rom = std::make_shared<RangeOfMotionConstraint>(box, params_.GetTotalTime(), params_.dt_constraint_range_of_motion_, ee, s);
+    }
+    else {
+	  // use constraint without sphere
+      rom = std::make_shared<RangeOfMotionSphericalConstraint>(box, sphere, params_.GetTotalTime(), params_.dt_constraint_range_of_motion_, ee, s);
+    }
     c.push_back(rom);
   }
 

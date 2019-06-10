@@ -72,7 +72,7 @@ public:
   }
 
   virtual Sphere3d GetBoundingSphere(EE ee) const {
-    return Sphere3d(Vector3d::Zero(), 0.0); 
+    return Sphere3d(Vector3d::Zero(), std::numeric_limits<double>::infinity());
   }
 
   virtual int GetNumberOfEndeffectors() const {

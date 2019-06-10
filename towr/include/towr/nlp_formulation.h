@@ -73,6 +73,7 @@ namespace towr {
 class NlpFormulation {
 public:
   using VariablePtrVec   = std::vector<ifopt::VariableSet::Ptr>;
+  using ContraintPtr     = ifopt::ConstraintSet::Ptr;
   using ContraintPtrVec  = std::vector<ifopt::ConstraintSet::Ptr>;
   using CostPtrVec       = std::vector<ifopt::CostTerm::Ptr>;
   using EEPos            = std::vector<Eigen::Vector3d>;
@@ -116,7 +117,7 @@ private:
   ContraintPtrVec GetConstraint(Parameters::ConstraintName name,
                                 const SplineHolder& splines) const;
   ContraintPtrVec MakeDynamicConstraint(const SplineHolder& s) const;
-  ContraintPtrVec MakeRangeOfMotionBoxConstraint(const SplineHolder& s) const;
+  ContraintPtrVec MakeRangeOfMotionConstraint(const SplineHolder& s) const;
   ContraintPtrVec MakeRangeOfMotionSphericalConstraint (const SplineHolder& s) const;
   ContraintPtrVec MakeTotalTimeConstraint() const;
   ContraintPtrVec MakeTerrainConstraint() const;

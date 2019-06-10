@@ -139,7 +139,7 @@ public:
    * optimization problem.
    */
   enum ConstraintName { Dynamic,                 ///< sets DynamicConstraint
-                        EndeffectorBoxRom,       ///< sets RangeOfMotionConstraint
+                        EndeffectorRom,          ///< sets RangeOfMotionConstraint
                         EndeffectorSphericalRom, ///< sets RangeOfMotionSphericalConstraint
                         TotalTime,               ///< sets TotalDurationConstraint
                         Terrain,                 ///< sets TerrainConstraint
