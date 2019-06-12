@@ -48,7 +48,7 @@ class Sphere3d {
     Sphere3d(const Sphere3d& s) = default;
   
     const Vector3d& center() const { return center_; }
-    Vector3d center() { return center_; }
+    Vector3d& center() { return center_; }
     double radius() const { return radius_; };
     double& radius() { return radius_; };
   
