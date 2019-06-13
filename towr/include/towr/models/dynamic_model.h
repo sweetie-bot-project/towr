@@ -73,22 +73,9 @@ public:
   using BaseAcc  = Eigen::Matrix<double,6,1>;
   using Jac      = Eigen::SparseMatrix<double, Eigen::RowMajor>;
   using EEPos    = std::vector<Eigen::Vector3d>;
+  using EEAcc    = EEPos;
   using EELoad   = EEPos;
   using EE       = uint;
-
-  /**
-   * @brief Sets the current state and input of the system.
-   * @param com_W        Current Center-of-Mass (x,y,z) position in world frame.
-   * @param com_acc_W    Current Center-of-Mass (x,y,z) acceleration in world.
-   * @param w_R_b        Current rotation from base to world frame.
-   * @param omega_W      Current angular velocity in world frame.
-   * @param omega_dot_W  Current angular acceleration in world frame.
-   * @param force_W      Force at each foot expressed in world frame.
-   * @param pos_W        Position of each foot expressed in world frame
-   */
-  void SetCurrent(const ComPos& com_W, const Vector3d com_acc_W,
-                  const Matrix3d& w_R_b, const AngVel& omega_W, const Vector3d& omega_dot_W,
-                  const EELoad& force_W, const EEPos& pos_W);
 
   /**
    * @brief  The violation of the system dynamics incurred by the current values.
@@ -153,7 +140,7 @@ public:
    */
   int GetEECount() const { return ee_pos_.size(); };
 
-protected:
+public:
   ComPos com_pos_;   ///< x-y-z position of the Center-of-Mass.
   Vector3d com_acc_; ///< x-y-z acceleration of the Center-of-Mass.
 
@@ -162,6 +149,7 @@ protected:
   Vector3d omega_dot_; ///< angular acceleration expressed in world frame.
 
   EEPos  ee_pos_;   ///< The x-y-z position of each endeffector.
+  EEAcc  ee_acc_;   ///< The acceleration of each end effector.
   EELoad ee_force_; ///< The endeffector force expressed in world frame.
 
   /**

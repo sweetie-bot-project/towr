@@ -119,21 +119,22 @@ DynamicConstraint::UpdateJacobianAtInstance(double t, int k, std::string var_set
 void
 DynamicConstraint::UpdateModel (double t) const
 {
-  auto com = base_linear_->GetPoint(t);
-
-  Eigen::Matrix3d w_R_b = base_angular_.GetRotationMatrixBaseToWorld(t);
-  Eigen::Vector3d omega = base_angular_.GetAngularVelocityInWorld(t);
-  Eigen::Vector3d omega_dot = base_angular_.GetAngularAccelerationInWorld(t);
-
+  // base linear motion
+  auto com_motion = base_linear_->GetPoint(t);
+  model_->com_pos_ = com_motion.p();
+  model_->com_acc_ = com_motion.a();
+  // base angular motion
+  model_->w_R_b_ = base_angular_.GetRotationMatrixBaseToWorld(t);
+  model_->omega_ = base_angular_.GetAngularVelocityInWorld(t);
+  model_->omega_dot_ = base_angular_.GetAngularAccelerationInWorld(t);
+  // ee motion
   int n_ee = model_->GetEECount();
-  std::vector<Eigen::Vector3d> ee_pos;
-  std::vector<Eigen::Vector3d> ee_force;
   for (int ee=0; ee<n_ee; ++ee) {
-    ee_force.push_back(ee_forces_.at(ee)->GetPoint(t).p());
-    ee_pos.push_back(ee_motion_.at(ee)->GetPoint(t).p());
+    model_->ee_force_.at(ee) = ee_forces_.at(ee)->GetPoint(t).p();
+	auto ee_motion = ee_motion_.at(ee)->GetPoint(t);
+    model_->ee_pos_.at(ee) = ee_motion.p();
+    model_->ee_acc_.at(ee) = ee_motion.a();
   }
-
-  model_->SetCurrent(com.p(), com.a(), w_R_b, omega, omega_dot, ee_force, ee_pos);
 }
 
 } /* namespace towr */
