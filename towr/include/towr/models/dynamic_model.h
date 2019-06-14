@@ -117,13 +117,14 @@ public:
 
   /**
    * @brief How the endeffector positions affect the dynamic violation.
-   * @param ee_force  The 3xn Jacobian of the foot position x,y,z.
+   * @param ee_pos    The 3xn Jacobian of the foot position x,y,z.
+   * @param ee_acc    The 3xn Jacobian of the foot acceleration x,y,z.
    * @param ee        The endeffector for which the senstivity is required.
    *
    * @return The 6xn Jacobian of dynamic violations with respect to
    *         variables defining the foot positions (e.g. node values).
    */
-  virtual Jac GetJacobianWrtEEPos(const Jac& ee_pos, EE ee) const = 0;
+  virtual Jac GetJacobianWrtEEPos(const Jac& ee_pos, const Jac& ee_acc,  EE ee) const = 0;
 
   /**
    * @returns The gravity acceleration [m/s^2] (positive)

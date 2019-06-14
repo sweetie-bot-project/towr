@@ -101,7 +101,8 @@ DynamicConstraint::UpdateJacobianAtInstance(double t, int k, std::string var_set
 
     if (var_set == id::EEMotionNodes(ee)) {
       Jacobian jac_ee_pos = ee_motion_.at(ee)->GetJacobianWrtNodes(t,kPos);
-      jac_model = model_->GetJacobianWrtEEPos(jac_ee_pos, ee);
+      Jacobian jac_ee_acc = ee_motion_.at(ee)->GetJacobianWrtNodes(t,kAcc);
+      jac_model = model_->GetJacobianWrtEEPos(jac_ee_pos, jac_ee_acc, ee);
     }
 
     if (var_set == id::EESchedule(ee)) {
@@ -109,7 +110,8 @@ DynamicConstraint::UpdateJacobianAtInstance(double t, int k, std::string var_set
       jac_model += model_->GetJacobianWrtForce(jac_f_dT, ee);
 
       Jacobian jac_x_dT = ee_motion_.at(ee)->GetJacobianOfPosWrtDurations(t);
-      jac_model +=  model_->GetJacobianWrtEEPos(jac_x_dT, ee);
+      Jacobian jac_a_dT(k3D, jac_x_dT.cols()); //TODO implement GetJacobianOfAccWrtDurations(t);
+      jac_model +=  model_->GetJacobianWrtEEPos(jac_x_dT, jac_a_dT, ee);
     }
   }
 

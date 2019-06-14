@@ -179,7 +179,7 @@ SingleRigidBodyDynamics::GetJacobianWrtForce (const Jac& jac_force, EE ee) const
 }
 
 SingleRigidBodyDynamics::Jac
-SingleRigidBodyDynamics::GetJacobianWrtEEPos (const Jac& jac_ee_pos, EE ee) const
+SingleRigidBodyDynamics::GetJacobianWrtEEPos (const Jac& jac_ee_pos, const Jac& jac_ee_acc, EE ee) const
 {
   Vector3d f = ee_force_.at(ee);
   Jac jac_tau = Cross(f)*(-jac_ee_pos);

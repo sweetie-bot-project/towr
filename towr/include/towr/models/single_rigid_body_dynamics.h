@@ -86,7 +86,7 @@ public:
                             double t) const override;
   Jac GetJacobianWrtForce(const Jac& jac_force, EE) const override;
 
-  Jac GetJacobianWrtEEPos(const Jac& jac_ee_pos, EE) const override;
+  Jac GetJacobianWrtEEPos(const Jac& jac_ee_pos, const Jac& jac_ee_acc, EE) const override;
 
 private:
   /** Inertia of entire robot around the CoM expressed in a frame anchored
