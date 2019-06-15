@@ -130,6 +130,8 @@ private:
   CostPtrVec GetCost(const Parameters::CostName& id, double weight) const;
   CostPtrVec MakeForcesCost(double weight) const;
   CostPtrVec MakeEEMotionCost(double weight) const;
+  CostPtrVec MakeBaseLinMotionCost(double weight) const;
+  CostPtrVec MakeBaseAngMotionCost(double weight) const;
 };
 
 } /* namespace towr */

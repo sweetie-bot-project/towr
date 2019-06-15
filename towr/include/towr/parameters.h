@@ -153,7 +153,10 @@ public:
    *  problem.
    */
   enum CostName       { ForcesCostID,    ///< sets NodeCost on force nodes
-                        EEMotionCostID   ///< sets NodeCost on endeffector velocity
+                        EEMotionCostID,   ///< sets NodeCost on endeffector velocity
+                        BaseLinMotionCostID, ///< sets NodeCost on base linear velocity
+                        BaseAngMotionCostID, ///< sets NodeCost on base angular velocity
+                        BaseAccCostID,   ///< sets NodeCost on base acceleration
   };
 
   using CostWeights      = std::vector<std::pair<CostName, double>>;
@@ -176,7 +179,7 @@ public:
   /// Which constraints should be used in the optimization problem.
   UsedConstraints constraints_;
 
-  /// Which costs should be used in the optimiation problem.
+  /// Which costs should be used in the optimiation problem.  
   CostWeights costs_;
 
   /// Interval at which the dynamic constraint is enforced.
