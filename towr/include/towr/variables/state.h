@@ -65,29 +65,29 @@ public:
    * @param   deriv  Index for that specific derivative (pos=0, vel=1, acc=2).
    * @return  Read-only n-dimensional position, velocity or acceleration.
    */
-  const VectorXd at(Dx deriv) const;
+  const VectorXd& at(Dx deriv) const { return values_.at(deriv); }
 
   /**
    * @brief   Read or write a specific state derivative by index.
    * @param   deriv  Index for that specific derivative (pos=0, vel=1, acc=2).
    * @return  Read/write n-dimensional position, velocity or acceleration.
    */
-  VectorXd& at(Dx deriv);
+  VectorXd& at(Dx deriv) { return values_.at(deriv); }
 
   /**
    * @brief read access to the zero-derivative of the state, e.g. position.
    */
-  const VectorXd p() const;
+  const VectorXd& p() const { return at(kPos); }
 
   /**
    * @brief read access to the first-derivative of the state, e.g. velocity.
    */
-  const VectorXd v() const;
+  const VectorXd& v() const { return at(kVel); }
 
   /**
    * @brief read access to the second-derivative of the state, e.g. acceleration.
    */
-  const VectorXd a() const;
+  const VectorXd& a() const { return at(kAcc); }
 
 private:
   std::vector<VectorXd> values_; ///< e.g. position, velocity and acceleration, ...
@@ -112,7 +112,6 @@ public:
    * @brief Constructs a @a dim - dimensional node (default zero-dimensional).
    */
   explicit Node(int dim = 0) : State(dim, n_derivatives) {};
-  virtual ~Node() = default;
 };
 
 
