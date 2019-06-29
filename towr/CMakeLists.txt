@@ -24,6 +24,7 @@ add_library(${PROJECT_NAME} SHARED
   src/nodes_variables.cc
   src/nodes_variables_all.cc
   src/nodes_variables_phase_based.cc
+  src/nodes_variables_time_based.cc
   src/phase_durations.cc
   # models
   src/robot_model.cc
@@ -59,6 +60,7 @@ add_library(${PROJECT_NAME} SHARED
   src/spline.cc
   src/phase_spline.cc
   src/node_spline.cc
+  src/fake_spline.cc
   src/nodes_observer.cc
   src/spline_holder.cc
   src/euler_converter.cc

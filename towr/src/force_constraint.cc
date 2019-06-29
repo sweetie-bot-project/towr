@@ -33,28 +33,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace towr {
 
-
 ForceConstraint::ForceConstraint (const HeightMap::Ptr& terrain,
                                   double force_limit,
                                   EE ee)
-    :ifopt::ConstraintSet(kSpecifyLater, "force-" + id::EEForceNodes(ee))
+    : ifopt::ConstraintSet(kSpecifyLater, "force-" + id::EEForceNodes(ee))
 {
   terrain_ = terrain;
   fn_max_  = force_limit;
   mu_      = terrain->GetFrictionCoeff();
   ee_      = ee;
-
   n_constraints_per_node_ = 1 + 2*k2D; // positive normal force + 4 friction pyramid constraints
 }
 
 void
 ForceConstraint::InitVariableDependedQuantities (const VariablesPtr& x)
 {
-  ee_force_  = x->GetComponent<NodesVariablesPhaseBased>(id::EEForceNodes(ee_));
+  //TODO this function perform second stage of initizlization. In future this procedure should be unified for all constraints: 
+  // either all initialization should happen in constructor, either all binding to variables should be happen hear.
   ee_motion_ = x->GetComponent<NodesVariablesPhaseBased>(id::EEMotionNodes(ee_));
-
+  ee_force_  = x->GetComponent<NodesVariablesEEForceTimeBased>(id::EEForceNodes(ee_));
+  // get list of optimized nodes
   pure_stance_force_node_ids_ = ee_force_->GetIndicesOfNonConstantNodes();
-
+  // calculate number of constraints
   int constraint_count = pure_stance_force_node_ids_.size()*n_constraints_per_node_;
   SetRows(constraint_count);
 }
@@ -65,10 +65,11 @@ ForceConstraint::GetValues () const
   VectorXd g(GetRows());
 
   int row=0;
-  auto force_nodes = ee_force_->GetNodes();
+  const std::vector<towr::Node>& force_nodes = ee_force_->GetNodes();
+
   for (int f_node_id : pure_stance_force_node_ids_) {
     int phase  = ee_force_->GetPhase(f_node_id);
-    Vector3d p = ee_motion_->GetValueAtStartOfPhase(phase); // doesn't change during stance phase
+    Vector3d p  = ee_motion_->GetValueAtStartOfPhase(phase); // doesn't change during phase
     Vector3d n = terrain_->GetNormalizedBasis(HeightMap::Normal, p.x(), p.y());
     Vector3d f = force_nodes.at(f_node_id).p();
 
@@ -112,7 +113,7 @@ ForceConstraint::FillJacobianBlock (std::string var_set,
     int row = 0;
     for (int f_node_id : pure_stance_force_node_ids_) {
       // unilateral force
-      int phase   = ee_force_->GetPhase(f_node_id);
+      int phase  = ee_force_->GetPhase(f_node_id);
       Vector3d p  = ee_motion_->GetValueAtStartOfPhase(phase); // doesn't change during phase
       Vector3d n  = terrain_->GetNormalizedBasis(HeightMap::Normal,   p.x(), p.y());
       Vector3d t1 = terrain_->GetNormalizedBasis(HeightMap::Tangent1, p.x(), p.y());
@@ -120,6 +121,7 @@ ForceConstraint::FillJacobianBlock (std::string var_set,
 
       for (auto dim : {X,Y,Z}) {
         int idx = ee_force_->GetOptIndex(NodesVariables::NodeValueInfo(f_node_id, kPos, dim));
+		assert(idx != NodesVariables::NodeValueNotOptimized);
 
         int row_reset=row;
 
@@ -137,7 +139,8 @@ ForceConstraint::FillJacobianBlock (std::string var_set,
 
   if (var_set == ee_motion_->GetName()) {
     int row = 0;
-    auto force_nodes = ee_force_->GetNodes();
+    const std::vector<towr::Node>& force_nodes = ee_force_->GetNodes();
+
     for (int f_node_id : pure_stance_force_node_ids_) {
       int phase  = ee_force_->GetPhase(f_node_id);
       int ee_node_id = ee_motion_->GetNodeIDAtStartOfPhase(phase);
@@ -151,9 +154,10 @@ ForceConstraint::FillJacobianBlock (std::string var_set,
         Vector3d dt2 = terrain_->GetDerivativeOfNormalizedBasisWrt(HeightMap::Tangent2, dim, p.x(), p.y());
 
         int idx = ee_motion_->GetOptIndex(NodesVariables::NodeValueInfo(ee_node_id, kPos, dim));
-        int row_reset=row;
+		assert(idx != NodesVariables::NodeValueNotOptimized);
 
-        // unilateral force
+        int row_reset=row;
+	    // unilateral force
         jac.coeffRef(row_reset++, idx) = f.transpose()*dn;
 
         // friction force tangent 1 derivative
@@ -163,11 +167,12 @@ ForceConstraint::FillJacobianBlock (std::string var_set,
         // friction force tangent 2 derivative
         jac.coeffRef(row_reset++, idx) = f.transpose()*(dt2-mu_*dn);
         jac.coeffRef(row_reset++, idx) = f.transpose()*(dt2+mu_*dn);
-      }
+	  }
 
       row += n_constraints_per_node_;
     }
   }
 }
+
 
 } /* namespace towr */

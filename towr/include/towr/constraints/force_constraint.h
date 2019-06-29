@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ifopt/constraint_set.h>
 
 #include <towr/variables/nodes_variables_phase_based.h>
+#include <towr/variables/nodes_variables_time_based.h>
 #include <towr/terrain/height_map.h> // for friction cone
 
 namespace towr {
@@ -75,7 +76,7 @@ public:
   void FillJacobianBlock (std::string var_set, Jacobian&) const override;
 
 private:
-  NodesVariablesPhaseBased::Ptr ee_force_;  ///< the current xyz foot forces.
+  NodesVariablesEEForceTimeBased::Ptr ee_force_;  ///< the current xyz foot forces.
   NodesVariablesPhaseBased::Ptr ee_motion_; ///< the current xyz foot positions.
 
   HeightMap::Ptr terrain_; ///< gradient information at every position (x,y).
@@ -85,7 +86,7 @@ private:
   EE ee_;                  ///< The endeffector force to be constrained.
 
   /**
-   * The are those Hermite-nodes that shape the polynomial during the
+   * The are those nodes that shape the polynomial during the
    * stance phases, while all the others are already set to zero force (swing)
    **/
   std::vector<int> pure_stance_force_node_ids_;

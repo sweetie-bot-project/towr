@@ -32,8 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "phase_durations.h"
 #include "node_spline.h"
+#include "fake_spline.h"
 #include "nodes_variables.h"
 #include "nodes_variables_phase_based.h"
+#include "nodes_variables_time_based.h"
 
 namespace towr {
 
@@ -59,7 +61,7 @@ struct SplineHolder {
                 NodesVariables::Ptr base_ang,
                 const std::vector<double>& base_poly_durations,
                 std::vector<NodesVariablesPhaseBased::Ptr> ee_motion,
-                std::vector<NodesVariablesPhaseBased::Ptr> ee_force,
+				std::vector<NodesVariablesTimeBased::Ptr> ee_force,
                 std::vector<PhaseDurations::Ptr> phase_durations,
                 bool ee_durations_change);
 
@@ -72,7 +74,7 @@ struct SplineHolder {
   NodeSpline::Ptr base_angular_;
 
   std::vector<NodeSpline::Ptr> ee_motion_;
-  std::vector<NodeSpline::Ptr> ee_force_;
+  std::vector<FakeSpline::Ptr> ee_force_;
   std::vector<PhaseDurations::Ptr> phase_durations_;
 };
 

@@ -121,6 +121,7 @@ NlpFormulation::MakeBaseVariables () const
   spline_ang->AddFinalBound(kPos, params_.bounds_final_ang_pos_, final_base_.ang.p());
   spline_ang->AddFinalBound(kVel, params_.bounds_final_ang_vel_, final_base_.ang.v());
   vars.push_back(spline_ang);
+  std::cout  << "MakeBase 4" << std::endl;
 
   return vars;
 }
@@ -180,18 +181,18 @@ NlpFormulation::MakeEndeffectorVariables () const
   return vars;
 }
 
-std::vector<NodesVariablesPhaseBased::Ptr>
+std::vector<NodesVariablesTimeBased::Ptr>
 NlpFormulation::MakeForceVariables () const
 {
-  std::vector<NodesVariablesPhaseBased::Ptr> vars;
+  std::vector<NodesVariablesTimeBased::Ptr> vars;
 
   double T = params_.GetTotalTime();
   for (int ee=0; ee<params_.GetEECount(); ee++) {
-    auto nodes = std::make_shared<NodesVariablesEEForce>(
-                                              params_.GetPhaseCount(ee),
+    auto nodes = std::make_shared<NodesVariablesEEForceTimeBased>(
+                                              params_.ee_phase_durations_.at(ee),
                                               params_.ee_in_contact_at_start_.at(ee),
                                               id::EEForceNodes(ee),
-                                              params_.force_polynomials_per_stance_phase_);
+                                              params_.dt_constraint_dynamic_);
 
     // initialize with mass of robot distributed equally on all legs
     double m = model_.dynamic_model_->m();
