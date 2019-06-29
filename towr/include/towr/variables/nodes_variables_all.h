@@ -53,6 +53,7 @@ public:
   virtual ~NodesVariablesAll () = default;
 
   std::vector<NodeValueInfo> GetNodeValuesInfo(int idx) const override;
+  int GetOptIndex(const NodeValueInfo& nvi) const override;
 };
 
 } /* namespace towr */

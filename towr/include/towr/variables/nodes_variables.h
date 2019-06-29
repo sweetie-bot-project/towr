@@ -112,8 +112,8 @@ public:
    *
    * Reverse of GetNodeInfoAtOptIndex().
    */
-  int GetOptIndex(const NodeValueInfo& nvi) const;
-  static const int NodeValueNotOptimized = -1;
+  virtual int GetOptIndex(const NodeValueInfo& nvi) const;
+  static const int NodeValueNotOptimized;
 
   /**
    * @brief Pure optimization variables that define the nodes.

@@ -49,6 +49,8 @@ NodesVariables::GetOptIndex(const NodeValueInfo& nvi_des) const
   return NodeValueNotOptimized; // index representing these quantities doesn't exist
 }
 
+const int NodesVariables::NodeValueNotOptimized = -1;
+
 Eigen::VectorXd
 NodesVariables::GetValues () const
 {

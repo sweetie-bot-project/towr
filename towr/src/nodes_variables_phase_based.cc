@@ -203,36 +203,47 @@ NodesVariablesEEMotion::NodesVariablesEEMotion(int phase_count,
                               name,
                               n_polys_in_changing_phase)
 {
-  index_to_node_value_info_ = GetPhaseBasedEEParameterization();
+  SetupPhaseBasedEEParameterization();
   SetNumberOfVariables(index_to_node_value_info_.size());
 }
 
-NodesVariablesEEForce::OptIndexMap
-NodesVariablesEEMotion::GetPhaseBasedEEParameterization ()
+void
+NodesVariablesEEMotion::SetupPhaseBasedEEParameterization ()
 {
-  OptIndexMap index_map;
+  index_to_node_value_info_.clear();
+  node_id_opt_index_base_.clear();
+  node_id_opt_index_base_.reserve(nodes_.size());
 
   int idx = 0; // index in variables set
   for (int node_id=0; node_id<nodes_.size(); ++node_id) {
     // swing node:
     if (!IsConstantNode(node_id)) {
+	  // reverse opt index
+      node_id_opt_index_base_.push_back(idx);
+
       for (int dim=0; dim<GetDim(); ++dim) {
         // intermediate way-point position of swing motion are optimized
-        index_map[idx++].push_back(NodeValueInfo(node_id, kPos, dim));
-
+		index_to_node_value_info_.emplace_back( std::vector<NodeValueInfo>( { NodeValueInfo(node_id, kPos, dim) } ) );
+        idx++;
         // velocity in vertical direction fixed to zero and not optimized.
         // Since we often choose two polynomials per swing-phase, this restricts
         // the swing to have reached it's extreme at half-time and creates
         // smoother stepping motions.
         if (dim == Z)
           nodes_.at(node_id).at(kVel).z() = 0.0;
-        else
+        else {
           // velocity in x,y dimension during swing fully optimized.
-          index_map[idx++].push_back(NodeValueInfo(node_id, kVel, dim));
+		  index_to_node_value_info_.emplace_back( std::vector<NodeValueInfo>({ NodeValueInfo(node_id, kVel, dim) } ) );
+		  idx++;
+		}
       }
     }
     // stance node (next one will also be stance, so handle that one too):
     else {
+	  // reverse opt index
+      node_id_opt_index_base_.push_back(idx);
+      node_id_opt_index_base_.push_back(idx);
+
       // ensure that foot doesn't move by not even optimizing over velocities
       nodes_.at(node_id).at(kVel).setZero();
       nodes_.at(node_id+1).at(kVel).setZero();
@@ -240,44 +251,66 @@ NodesVariablesEEMotion::GetPhaseBasedEEParameterization ()
       // position of foot is still an optimization variable used for
       // both start and end node of that polynomial
       for (int dim=0; dim<GetDim(); ++dim) {
-        index_map[idx].push_back(NodeValueInfo(node_id,   kPos, dim));
-        index_map[idx].push_back(NodeValueInfo(node_id+1, kPos, dim));
-        idx++;
+        index_to_node_value_info_.emplace_back( std::vector<NodeValueInfo>( { NodeValueInfo(node_id, kPos, dim), NodeValueInfo(node_id+1, kPos, dim) } ) );
+		idx++;
       }
 
       node_id += 1; // already added next constant node, so skip
     }
   }
+}
 
-  return index_map;
+int
+NodesVariablesEEMotion::GetOptIndex(const NodeValueInfo& nvi) const
+{
+  int base = node_id_opt_index_base_.at(nvi.id_);
+
+  if (!IsConstantNode(nvi.id_)) {
+	if ( (nvi.dim_ == X || nvi.dim_ == Y) && (nvi.deriv_ == kPos || nvi.deriv_ == kVel) ) {
+	   	return base + 2*nvi.dim_ + nvi.deriv_;
+	}
+    if (nvi.dim_ == Z && nvi.deriv_ == kPos) return base + 2*nvi.dim_;
+  }
+  else {
+    if (nvi.deriv_ == kVel) return NodeValueNotOptimized;
+    if (nvi.deriv_ == kPos) return base + nvi.dim_;
+  }
+  return NodeValueNotOptimized;
 }
 
 NodesVariablesEEForce::NodesVariablesEEForce(int phase_count,
                                               bool is_in_contact_at_start,
                                               const std::string& name,
                                               int n_polys_in_changing_phase)
-    :NodesVariablesPhaseBased(phase_count,
+    : NodesVariablesPhaseBased(phase_count,
                               !is_in_contact_at_start, // contact phase for force is non-constant
                               name,
                               n_polys_in_changing_phase)
 {
-  index_to_node_value_info_ = GetPhaseBasedEEParameterization();
+  SetupPhaseBasedEEParameterization();
   SetNumberOfVariables(index_to_node_value_info_.size());
 }
 
-NodesVariablesEEForce::OptIndexMap
-NodesVariablesEEForce::GetPhaseBasedEEParameterization ()
+void
+NodesVariablesEEForce::SetupPhaseBasedEEParameterization ()
 {
-  OptIndexMap index_map;
+  index_to_node_value_info_.clear();
+  node_id_opt_index_base_.clear();
+  node_id_opt_index_base_.reserve(nodes_.size());
 
   int idx = 0; // index in variables set
   for (int id=0; id<nodes_.size(); ++id) {
     // stance node:
     // forces can be created during stance, so these nodes are optimized over.
     if (!IsConstantNode(id)) {
+	  // reverse opt index
+      node_id_opt_index_base_.push_back(idx);
+
       for (int dim=0; dim<GetDim(); ++dim) {
-        index_map[idx++].push_back(NodeValueInfo(id, kPos, dim));
-        index_map[idx++].push_back(NodeValueInfo(id, kVel, dim));
+		index_to_node_value_info_.emplace_back( std::vector<NodeValueInfo>( { NodeValueInfo(id, kPos, dim) } ) );
+		idx++;
+		index_to_node_value_info_.emplace_back( std::vector<NodeValueInfo>( { NodeValueInfo(id, kVel, dim) } ) );
+		idx++;
       }
     }
     // swing node (next one will also be swing, so handle that one too)
@@ -289,12 +322,27 @@ NodesVariablesEEForce::GetPhaseBasedEEParameterization ()
 
       nodes_.at(id).at(kVel).setZero();
       nodes_.at(id+1).at(kVel).setZero();
+	  // reverse opt index
+      node_id_opt_index_base_.push_back(NodeValueNotOptimized);
+      node_id_opt_index_base_.push_back(NodeValueNotOptimized);
 
       id += 1; // already added next constant node, so skip
     }
   }
+}
 
-  return index_map;
+int
+NodesVariablesEEForce::GetOptIndex(const NodeValueInfo& nvi) const
+{
+  int base = node_id_opt_index_base_.at(nvi.id_);
+
+  if (!IsConstantNode(nvi.id_)) {
+	if ( (nvi.dim_ == X || nvi.dim_ == Y || nvi.dim_ == Z) 
+			&& (nvi.deriv_ == kPos || nvi.deriv_ == kVel) ) {
+	   	return base + 2*nvi.dim_ + nvi.deriv_;
+	}
+  }
+  return NodeValueNotOptimized;
 }
 
 } /* namespace towr */

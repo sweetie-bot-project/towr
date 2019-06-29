@@ -60,4 +60,15 @@ NodesVariablesAll::GetNodeValuesInfo (int idx) const
   return vec_nvi;
 }
 
+int
+NodesVariablesAll::GetOptIndex(const NodeValueInfo& nvi) const {
+  if ( (nvi.dim_ == X || nvi.dim_ == Y || nvi.dim_ == Z) &&
+         (nvi.deriv_ == kPos || nvi.deriv_ == kVel) ) 
+  {
+    int n_opt_values_per_node_ = 2*GetDim();
+    return nvi.id_*n_opt_values_per_node_ + nvi.deriv_*GetDim() + nvi.dim_;
+  }
+  return NodeValueNotOptimized;
+}
+
 } /* namespace towr */

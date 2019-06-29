@@ -60,7 +60,7 @@ class NodesVariablesPhaseBased : public NodesVariables {
 public:
   using Ptr         = std::shared_ptr<NodesVariablesPhaseBased>;
   using NodeIds     = std::vector<int>;
-  using OptIndexMap = std::map<int, std::vector<NodeValueInfo> >;
+  using OptIndexMap = std::vector< std::vector<NodeValueInfo> >; 
 
   /**
    * @brief Holds semantic information each polynomial in spline.
@@ -195,7 +195,10 @@ public:
                          const std::string& name,
                          int n_polys_in_changing_phase);
   virtual ~NodesVariablesEEMotion() = default;
-  OptIndexMap GetPhaseBasedEEParameterization ();
+  void SetupPhaseBasedEEParameterization ();
+protected:
+  std::vector<int> node_id_opt_index_base_; // Base index of each node. For constant nodes it is equal to NodeValueNotOptimized value.
+  virtual int GetOptIndex(const NodeValueInfo& nvi) const override;
 };
 
 
@@ -211,7 +214,11 @@ public:
                          const std::string& name,
                          int n_polys_in_changing_phase);
   virtual ~NodesVariablesEEForce() = default;
-  OptIndexMap GetPhaseBasedEEParameterization ();
+  void SetupPhaseBasedEEParameterization ();
+
+protected:
+  std::vector<int> node_id_opt_index_base_; // Base index of each node. For constant nodes it is equal to NodeValueNotOptimized value.
+  virtual int GetOptIndex(const NodeValueInfo& nvi) const override;
 };
 
 } /* namespace towr */
