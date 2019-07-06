@@ -45,6 +45,7 @@ add_library(${PROJECT_NAME} SHARED
   src/linear_constraint.cc
   # costs
   src/node_cost.cc
+  src/accel_square_norm_cost.cc
   src/soft_constraint.cc
   # initialization
   src/gait_generator.cc
@@ -115,7 +116,7 @@ endif()
 include(GNUInstallDirs) # for correct libraries locations across platforms
 set(config_package_location "share/${PROJECT_NAME}/cmake") # for .cmake find-scripts installs
 install(
-  TARGETS ${PROJECT_NAME} ${PROJECT_NAME}-example 
+  TARGETS ${PROJECT_NAME} ${PROJECT_NAME}-example
   EXPORT ${PROJECT_NAME}-targets
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
