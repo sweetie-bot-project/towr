@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <towr/variables/node_spline.h>
 
 #include <towr/variables/nodes_variables.h>
+#include <iostream>
 
 namespace towr {
 
@@ -109,6 +110,34 @@ NodeSpline::FillJacobianWrtNodes (int poly_id, double t_local, Dx dxdt,
       }
     }
   }
+}
+
+NodeSpline::Jacobian
+NodeSpline::GetAccSquareNormJacobianWrtNodes () const
+{
+  Jacobian jac(node_values_->GetDim(), node_values_->GetRows());
+
+  for (int idx=0; idx<jac.cols(); ++idx) {
+    double val = 0.0;
+    for (const auto& nvi : node_values_->GetNodeValuesInfo(idx)) {
+	  //each node potentially affects two polynomials except for two border nodes
+	  //TODO more regualar method to compute node_id -> poly_id mapping
+	  
+	  //std::cout << "NVI: " << nvi.id_ << " " << nvi.deriv_ << " " << nvi.dim_ << " idx: " << idx <<  std::endl;
+	  //std::cout << "sizes: cubic_polys " << cubic_polys_.size() << " node_values " << node_values_->GetNodes().size() << std::endl;
+
+	  int node_id = nvi.id_;
+	  if (node_id > 0) {
+        val += cubic_polys_.at(node_id-1).GetDerivativeOfAccSquareNormWrtEndNode(nvi.deriv_)(nvi.dim_);
+	  }
+	  if (node_id < cubic_polys_.size()) {
+        val += cubic_polys_.at(node_id).GetDerivativeOfAccSquareNormWrtStartNode(nvi.deriv_)(nvi.dim_);
+	  }
+
+	  jac.coeffRef(nvi.dim_, idx) = val;
+    }
+  }
+  return jac;
 }
 
 } /* namespace towr */

@@ -98,6 +98,13 @@ public:
    */
   VecTimes GetPolyDurations() const;
 
+
+  /**
+   * Get squre of L2 norm of acceleration.
+   */
+  Eigen::VectorXd 
+  GetAccSquareNormValue() const;
+  
 protected:
   VecPoly cubic_polys_; ///< the sequence of polynomials making up the spline.
 

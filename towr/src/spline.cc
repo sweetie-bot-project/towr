@@ -141,5 +141,16 @@ Spline::GetTotalTime() const
   return std::accumulate(cubic_polys_.begin(), cubic_polys_.end(), 0.0, [](double t, VecPoly::const_reference p) -> double { return t + p.GetDuration(); }) ;
 }
 
+
+Eigen::VectorXd 
+Spline::GetAccSquareNormValue() const
+{
+	Eigen::VectorXd J;
+	J.setZero();
+	for (const auto&p : cubic_polys_)
+		J += p.GetAccSquareNormValue();
+	return J;
+}
+
 } /* namespace towr */
 

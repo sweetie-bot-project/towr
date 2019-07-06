@@ -101,6 +101,14 @@ public:
   virtual Jacobian
   GetJacobianOfPosWrtDurations(double t) const { assert(false); } // durations are fixed here
 
+  /**
+   * @brief How L2 norm of the second derivative of the spline changes when the node values change.
+   * @return the pxn Jacobian, where:
+   *             p: Number of dimensions of the spline
+   *             n: Number of optimized node variables.
+   */
+  Jacobian GetAccSquareNormJacobianWrtNodes () const;
+
 protected:
   /**
    * The size and non-zero elements of the Jacobian of the position w.r.t nodes.

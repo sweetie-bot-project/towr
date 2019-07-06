@@ -156,6 +156,10 @@ public:
    */
   const double GetDuration() const { return T_; };
 
+  VectorXd GetAccSquareNormValue() const;
+  VectorXd GetDerivativeOfAccSquareNormWrtStartNode(Dx node_value) const;
+  VectorXd GetDerivativeOfAccSquareNormWrtEndNode(Dx node_value) const;
+
 private:
   double T_;     ///< the total duration of the polynomial.
   Node n0_, n1_; ///< the start and final node comprising the polynomial.

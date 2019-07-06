@@ -256,4 +256,36 @@ CubicHermitePolynomial::GetDerivativeOfPosWrtDuration(double t) const
   return deriv;
 }
 
+Eigen::VectorXd
+CubicHermitePolynomial::GetAccSquareNormValue() const
+{
+  double T  = T_;
+  double T2 = std::pow(T_,2);
+  double T3 = std::pow(T_,3);
+
+  return 12*T3*coeff_[D].array().square() + 12*T2*coeff_[D].array()*coeff_[C].array() + 4*T*coeff_[C].array().square();
+}
+
+Eigen::VectorXd
+CubicHermitePolynomial::GetDerivativeOfAccSquareNormWrtStartNode(Dx node_value) const
+{
+  switch (node_value) {
+    case kPos: return 12*coeff_[D];
+    case kVel: return -4*coeff_[C];
+    default: assert(false); // only derivative wrt nodes values calculated
+  }
+}
+
+Eigen::VectorXd
+CubicHermitePolynomial::GetDerivativeOfAccSquareNormWrtEndNode(Dx node_value) const
+{
+  double T  = T_;
+
+  switch (node_value) {
+    case kPos: return -12*coeff_[D];
+    case kVel: return 4*coeff_[C] + 12*T*coeff_[D];
+    default: assert(false); // only derivative wrt nodes values calculated
+  }
+}
+
 } // namespace towr
