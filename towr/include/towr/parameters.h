@@ -156,7 +156,9 @@ public:
                         EEMotionCostID,   ///< sets NodeCost on endeffector velocity
                         BaseLinMotionCostID, ///< sets NodeCost on base linear velocity
                         BaseAngMotionCostID, ///< sets NodeCost on base angular velocity
-                        BaseAccCostID,   ///< sets NodeCost on base acceleration
+                        BaseLinAccCostID,   ///< sets L2 norm cost on base linear acceleration
+                        BaseAngAccCostID,   ///< sets L2 norm cost on base angular acceleration
+                        EEAccCostID,   ///< sets L2 norm cost EE accelerations
   };
 
   using CostWeights      = std::vector<std::pair<CostName, double>>;
@@ -202,6 +204,9 @@ public:
 
   /// The maximum allowable force [N] in normal direction
   double force_limit_in_normal_direction_;
+
+  /// Minimal height during swing phase
+  double min_swing_height_;
 
   /// which dimensions (x,y,z) of the final base state should be bounded
   DimSet bounds_final_lin_pos_,

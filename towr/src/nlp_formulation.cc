@@ -336,7 +336,7 @@ NlpFormulation::MakeTerrainConstraint () const
   ContraintPtrVec constraints;
 
   for (int ee=0; ee<params_.GetEECount(); ee++) {
-    auto c = std::make_shared<TerrainConstraint>(terrain_, id::EEMotionNodes(ee));
+    auto c = std::make_shared<TerrainConstraint>(terrain_, id::EEMotionNodes(ee), params_.min_swing_height_);
     constraints.push_back(c);
   }
 

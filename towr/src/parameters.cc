@@ -50,6 +50,7 @@ Parameters::Parameters ()
   dt_constraint_dynamic_ = 0.1;
   dt_constraint_base_motion_ = duration_base_polynomial_/4.; // only for base RoM constraint
   bound_phase_duration_ = std::make_pair(0.2, 1.0);  // used only when optimizing phase durations, so gait
+  min_swing_height_ = 0.01;
 
   // a minimal set of basic constraints
   constraints_.push_back(Terrain);

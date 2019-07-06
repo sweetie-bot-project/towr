@@ -34,11 +34,12 @@ namespace towr {
 
 
 TerrainConstraint::TerrainConstraint (const HeightMap::Ptr& terrain,
-                                      std::string ee_motion)
+                                      std::string ee_motion, double min_distance_above_terrain)
     :ConstraintSet(kSpecifyLater, "terrain-" + ee_motion)
 {
   ee_motion_id_ = ee_motion;
   terrain_ = terrain;
+  min_distance_above_terrain_ = min_distance_above_terrain;
 }
 
 void
@@ -80,7 +81,7 @@ TerrainConstraint::GetBounds () const
     if (ee_motion_->IsConstantNode(id))
       bounds.at(row) = ifopt::BoundZero;
     else
-      bounds.at(row) = ifopt::Bounds(0.0, max_distance_above_terrain);
+      bounds.at(row) = ifopt::Bounds(min_distance_above_terrain_, max_distance_above_terrain);
     row++;
   }
 
