@@ -75,7 +75,7 @@ int main()
     nlp.AddVariableSet(c);
   for (auto c : formulation.GetConstraints(solution))
     nlp.AddConstraintSet(c);
-  for (auto c : formulation.GetCosts())
+  for (auto c : formulation.GetCosts(solution))
     nlp.AddCostSet(c);
 
   // You can add your own elements to the nlp as well, simply by calling:

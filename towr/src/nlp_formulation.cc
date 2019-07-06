@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <towr/constraints/spline_acc_constraint.h>
 
 #include <towr/costs/node_cost.h>
+#include <towr/costs/accel_square_norm_cost.h>
 #include <towr/variables/nodes_variables_all.h>
 
 #include <iostream>
@@ -385,25 +386,28 @@ NlpFormulation::MakeBaseAccConstraint (const SplineHolder& s) const
 }
 
 NlpFormulation::ContraintPtrVec
-NlpFormulation::GetCosts() const
+NlpFormulation::GetCosts(const SplineHolder& s) const
 {
   ContraintPtrVec costs;
   for (const auto& pair : params_.costs_)
-    for (auto c : GetCost(pair.first, pair.second))
+    for (auto c : GetCost(pair.first, pair.second, s))
       costs.push_back(c);
 
   return costs;
 }
 
 NlpFormulation::CostPtrVec
-NlpFormulation::GetCost(const Parameters::CostName& name, double weight) const
+NlpFormulation::GetCost(const Parameters::CostName& name, double weight, const SplineHolder& s) const
 {
   switch (name) {
     case Parameters::ForcesCostID:   return MakeForcesCost(weight);
     case Parameters::EEMotionCostID: return MakeEEMotionCost(weight);
     case Parameters::BaseLinMotionCostID: return MakeBaseAngMotionCost(weight);
     case Parameters::BaseAngMotionCostID: return MakeBaseLinMotionCost(weight);
-    default: throw std::runtime_error("cost not defined!");
+    case Parameters::EEAccCostID: return MakeEEAccCost(weight, s);
+    case Parameters::BaseLinAccCostID: return CostPtrVec(1, std::make_shared<AccelSquareNormCost>(id::base_lin_nodes, weight, s.base_linear_) );
+    case Parameters::BaseAngAccCostID: return CostPtrVec(1, std::make_shared<AccelSquareNormCost>(id::base_ang_nodes, weight, s.base_angular_) );
+	default: throw std::runtime_error("cost not defined!");
   }
 }
 
@@ -454,5 +458,18 @@ NlpFormulation::MakeBaseAngMotionCost(double weight) const
 
   return cost;
 }
+
+NlpFormulation::CostPtrVec
+NlpFormulation::MakeEEAccCost(double weight, const SplineHolder& s) const
+{
+  CostPtrVec cost;
+
+  for (int ee=0; ee<params_.GetEECount(); ee++) {
+    cost.push_back(std::make_shared<AccelSquareNormCost>(id::EEMotionNodes(ee), weight, s.ee_motion_[ee]));
+  }
+
+  return cost;
+}
+
 
 } /* namespace towr */
