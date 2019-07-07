@@ -187,16 +187,16 @@ QuadrupedGaitGenerator::GetStrideWalkOverlap () const
 
   auto times =
   {
-      three, lateral, three,
+      three,  three,
       diagonal,
-      three, lateral, three,
+      three,  three,
       diagonal,
   };
   auto phase_contacts =
   {
-      bB_, bb_, Bb_,
+      bB_, Bb_,
       Pb_, // start lifting RH
-      PB_, PP_, BP_,
+      PB_, BP_,
       bP_, // start lifting LH
   };
 
