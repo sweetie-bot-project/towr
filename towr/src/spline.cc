@@ -145,11 +145,13 @@ Spline::GetTotalTime() const
 Eigen::VectorXd 
 Spline::GetAccSquareNormValue() const
 {
-	Eigen::VectorXd J;
-	J.setZero();
-	for (const auto&p : cubic_polys_)
-		J += p.GetAccSquareNormValue();
-	return J;
+  Eigen::VectorXd J;
+  if (cubic_polys_.size() > 0) {
+    J = cubic_polys_.front().GetAccSquareNormValue();
+    for (int k = 1; k < cubic_polys_.size(); k++)
+      J += cubic_polys_[k].GetAccSquareNormValue();
+  }
+  return J;
 }
 
 } /* namespace towr */
