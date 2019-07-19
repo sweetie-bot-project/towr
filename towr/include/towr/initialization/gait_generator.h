@@ -112,6 +112,11 @@ public:
    */
   void SetGaits(const std::vector<Gaits>& gaits);
 
+  /**
+   * @brief Change gait, by swapping left and right legs.
+   */
+  virtual void FlipLeftRight();
+
 protected:
   /// Phase times for the complete robot during which no contact state changes.
   std::vector<double> times_;

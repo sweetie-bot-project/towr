@@ -44,6 +44,8 @@ public:
   QuadrupedGaitGenerator ();
   virtual ~QuadrupedGaitGenerator () = default;
 
+  void FlipLeftRight() override;
+
 private:
   GaitInfo GetGait(Gaits gait) const override;
 

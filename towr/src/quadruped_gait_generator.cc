@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
 #include <iostream>
+#include <algorithm>
 
 #include <towr/models/endeffector_mappings.h>
 
@@ -107,6 +108,15 @@ QuadrupedGaitGenerator::GetGait(Gaits gait) const
     case Hop3E:   return RemoveTransition(GetStrideGallop());
     case Hop5:    return GetStrideLimp();
     default: assert(false); // gait not implemented
+  }
+}
+
+void 
+QuadrupedGaitGenerator::FlipLeftRight()
+{
+  for(ContactState& s : contacts_) {
+    std::swap(s[LF], s[RF]);
+    std::swap(s[LH], s[RH]);
   }
 }
 

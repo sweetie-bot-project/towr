@@ -44,6 +44,8 @@ public:
   BipedGaitGenerator ();
   virtual ~BipedGaitGenerator () = default;
 
+  void FlipLeftRight() override;
+
 private:
   GaitInfo GetGait(Gaits gait) const override;
 

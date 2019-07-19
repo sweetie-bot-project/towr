@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <towr/initialization/biped_gait_generator.h>
 
 #include <cassert>
+#include <algorithm>
 #include <iostream>
 
 #include <towr/models/endeffector_mappings.h>
@@ -76,6 +77,14 @@ BipedGaitGenerator::GetGait (Gaits gait) const
     case Hop3:    return GetStrideRightHop();
     case Hop5:    return GetStrideGallopHop();
     default: assert(false); // gait not implemented
+  }
+}
+
+void 
+BipedGaitGenerator::FlipLeftRight()
+{
+  for(ContactState& s : contacts_) {
+    std::swap(s[L], s[R]);
   }
 }
 

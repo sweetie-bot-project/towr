@@ -130,6 +130,12 @@ GaitGenerator::RemoveTransition (const GaitInfo& g) const
   return new_gait;
 }
 
-} /* namespace towr */
+void 
+GaitGenerator::FlipLeftRight()
+{
+  // by default do nothing
+}
 
+
+} /* namespace towr */
 
