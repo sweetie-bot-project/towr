@@ -152,6 +152,23 @@ NodesVariables::SetByLinearInterpolation(const VectorXd& initial_val,
 }
 
 void
+NodesVariables::SetByLinearInterpolationAllNodes(const VectorXd& initial_val,
+                                         const VectorXd& final_val,
+                                         double t_total)
+{
+  VectorXd dp = final_val-initial_val;
+  VectorXd average_velocity = dp / t_total;
+  int num_nodes = nodes_.size();
+
+  for(int idx=0; idx<num_nodes; idx++) {
+	 // TODO dimention check
+     VectorXd pos = initial_val + idx/static_cast<double>(num_nodes-1)*dp;
+	 nodes_[idx].at(kPos) = pos;
+     nodes_[idx].at(kVel) = average_velocity;
+  }
+}
+
+void
 NodesVariables::AddBounds(int node_id, Dx deriv,
                  const DimSet& dimensions,
                  const VectorXd& val)

@@ -177,12 +177,22 @@ public:
   int GetDim() const;
 
   /**
-   * @brief Sets nodes pos/vel equally spaced from initial to final position.
+   * @brief Sets nodes pos/vel equally spaced from initial to final position. Process only optimized nodes.
    * @param initial_val  value of the first node.
    * @param final_val  value of the final node.
    * @param t_total  The total duration to reach final node (to set velocities).
    */
   void SetByLinearInterpolation(const VectorXd& initial_val,
+                                const VectorXd& final_val,
+                                double t_total);
+
+  /**
+   * @brief Sets nodes pos/vel equally spaced from initial to final position. Process all nodes.
+   * @param initial_val  value of the first node.
+   * @param final_val  value of the final node.
+   * @param t_total  The total duration to reach final node (to set velocities).
+   */
+  void SetByLinearInterpolationAllNodes(const VectorXd& initial_val,
                                 const VectorXd& final_val,
                                 double t_total);
 
