@@ -41,6 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace towr {
 
+// 1-dimensional
+static constexpr int k1D = 1;
+
 // 2-dimensional
 static constexpr int k2D = 2;
 enum Dim2D { X_=0, Y_};

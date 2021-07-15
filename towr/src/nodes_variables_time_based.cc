@@ -78,14 +78,14 @@ NodesVariablesTimeBased::GetTimeIntervalDurations() const
 }
 
 
-NodesVariablesEEForceTimeBased::NodesVariablesEEForceTimeBased(const VecTimes& phase_durations, bool first_phase_contact, std::string variable_id, double dT) 
+NodesVariablesEEForceTimeBased::NodesVariablesEEForceTimeBased(const VecTimes& phase_durations, bool first_phase_contact, std::string variable_id, double dT, int n_dim) 
     : NodesVariablesTimeBased(variable_id, dT, std::accumulate(phase_durations.begin(), phase_durations.end(), 0.0) )
 {
   // total time
   int n_nodes = std::floor(TotalTime_ / dT_)+2;
 
   // setup nodes list
-  n_dim_ = k3D;
+  n_dim_ = n_dim;
   nodes_ = std::vector<Node>(n_nodes, Node(n_dim_));
   nodes_info_.reserve(n_nodes);
 

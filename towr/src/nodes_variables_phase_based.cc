@@ -278,6 +278,86 @@ NodesVariablesEEMotion::GetOptIndex(const NodeValueInfo& nvi) const
   return NodeValueNotOptimized;
 }
 
+NodesVariablesPlanarEEMotion::NodesVariablesPlanarEEMotion(int phase_count,
+                                               bool is_in_contact_at_start,
+											   double swing_height,
+                                               const std::string& name,
+                                               int n_polys_in_changing_phase)
+    :NodesVariablesPhaseBased(phase_count,
+                              is_in_contact_at_start, // contact phase for motion is constant
+                              name,
+                              n_polys_in_changing_phase)
+{
+  SetupPhaseBasedPlanarEEParameterization(swing_height);
+  SetNumberOfVariables(index_to_node_value_info_.size());
+}
+
+void
+NodesVariablesPlanarEEMotion::SetupPhaseBasedPlanarEEParameterization(double swing_height)
+{
+  index_to_node_value_info_.clear();
+  node_id_opt_index_base_.clear();
+  node_id_opt_index_base_.reserve(nodes_.size());
+
+  int idx = 0; // index in variables set
+  for (int node_id=0; node_id<nodes_.size(); ++node_id) {
+    // swing node:
+    if (!IsConstantNode(node_id)) {
+	  // reverse opt index
+      node_id_opt_index_base_.push_back(idx);
+		
+      // X, Y coordinates are being optimized (position and velocity)
+	  index_to_node_value_info_.emplace_back( std::vector<NodeValueInfo>( { NodeValueInfo(node_id, kPos, X) } ) );
+	  index_to_node_value_info_.emplace_back( std::vector<NodeValueInfo>( { NodeValueInfo(node_id, kVel, X) } ) );
+	  index_to_node_value_info_.emplace_back( std::vector<NodeValueInfo>( { NodeValueInfo(node_id, kPos, Y) } ) );
+	  index_to_node_value_info_.emplace_back( std::vector<NodeValueInfo>( { NodeValueInfo(node_id, kVel, Y) } ) );
+	  idx += 4;
+
+	  // fix Z coordinate and velocity
+	  nodes_.at(node_id).at(kPos).z() = swing_height;
+	  nodes_.at(node_id).at(kVel).z() = 0.0;;
+    }
+    // stance node (next one will also be stance, so handle that one too):
+    else {
+	  // reverse opt index
+      node_id_opt_index_base_.push_back(idx);
+      node_id_opt_index_base_.push_back(idx);
+
+      // ensure that foot doesn't move by not even optimizing over velocities
+      nodes_.at(node_id).at(kVel).setZero();
+      nodes_.at(node_id+1).at(kVel).setZero();
+
+      // position of foot is still an optimization variable used for
+      // both start and end node of that polynomial
+      index_to_node_value_info_.emplace_back( std::vector<NodeValueInfo>( { NodeValueInfo(node_id, kPos, X), NodeValueInfo(node_id+1, kPos, X) } ) );
+      index_to_node_value_info_.emplace_back( std::vector<NodeValueInfo>( { NodeValueInfo(node_id, kPos, Y), NodeValueInfo(node_id+1, kPos, Y) } ) );
+	  idx += 2;
+
+	  // Z coordinate is on ground level
+	  nodes_.at(node_id).at(kPos).z() = 0.0;
+
+      node_id += 1; // already added next constant node, so skip
+    }
+  }
+}
+
+int
+NodesVariablesPlanarEEMotion::GetOptIndex(const NodeValueInfo& nvi) const
+{
+  int base = node_id_opt_index_base_.at(nvi.id_);
+
+  if (!IsConstantNode(nvi.id_)) {
+	if ( (nvi.dim_ == X || nvi.dim_ == Y) && (nvi.deriv_ == kPos || nvi.deriv_ == kVel) ) {
+	   	return base + 2*nvi.dim_ + nvi.deriv_;
+	}
+  }
+  else {
+    if (nvi.deriv_ == kVel) return NodeValueNotOptimized;
+    if ((nvi.deriv_ == kPos) && (nvi.dim_ == X || nvi.dim_ == Y)) return base + nvi.dim_;
+  }
+  return NodeValueNotOptimized;
+}
+
 NodesVariablesEEForce::NodesVariablesEEForce(int phase_count,
                                               bool is_in_contact_at_start,
                                               const std::string& name,

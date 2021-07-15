@@ -60,10 +60,11 @@ FakeSpline::Jacobian
 FakeSpline::GetJacobianWrtNodes (double t_global, Dx dxdt) const
 {
   assert(dxdt == kPos);
+  int n_dims = node_values_->GetDim();
   int node_id = node_values_time_based_->GetNodeIdExact(t_global);
-  Jacobian jac = Jacobian(node_values_->GetDim(), node_values_->GetRows());
+  Jacobian jac = Jacobian(n_dims, node_values_->GetRows());
 
-  for(int dim = 0; dim < k3D; dim++) {
+  for(int dim = 0; dim < n_dims; dim++) {
     int idx = node_values_->GetOptIndex(NodesVariables::NodeValueInfo(node_id, kPos, dim));
 	if (idx != NodesVariables::NodeValueNotOptimized) {
 	  jac.coeffRef(dim, idx) = 1.0;
@@ -90,9 +91,9 @@ FakeSpline::GetJacobianWrtNodes (int id, double t_local, Dx dxdt) const
 	assert(std::abs(t_local - dT) < eps);
   }
 
-  Jacobian jac = Jacobian(node_values_->GetDim(), node_values_->GetRows());
-
-  for(int dim = 0; dim < k3D; dim++) {
+  int n_dims = node_values_->GetDim();
+  Jacobian jac = Jacobian(n_dims, node_values_->GetRows());
+  for(int dim = 0; dim < n_dims; dim++) {
     int idx = node_values_->GetOptIndex(NodesVariables::NodeValueInfo(node_id, kPos, dim));
 	if (idx != NodesVariables::NodeValueNotOptimized) {
 	  jac.coeffRef(dim, idx) = 1.0;

@@ -201,6 +201,28 @@ protected:
   virtual int GetOptIndex(const NodeValueInfo& nvi) const override;
 };
 
+/**
+ * @brief Variables fully defining the endeffector motion for planar case
+ *
+ * Z coordinate is not being optimized.
+ *
+ * @ingroup Variables
+ */
+class NodesVariablesPlanarEEMotion : public NodesVariablesPhaseBased {
+public:
+  NodesVariablesPlanarEEMotion(int phase_count,
+                         bool is_in_contact_at_start,
+						 double swing_height,
+                         const std::string& name,
+                         int n_polys_in_changing_phase);
+  virtual ~NodesVariablesPlanarEEMotion() = default;
+  void SetupPhaseBasedPlanarEEParameterization (double swing_height);
+protected:
+  std::vector<int> node_id_opt_index_base_; // Base index of each node. For constant nodes it is equal to NodeValueNotOptimized value.
+  virtual int GetOptIndex(const NodeValueInfo& nvi) const override;
+};
+
+
 
 /**
  * @brief Variables fully defining the endeffector forces.

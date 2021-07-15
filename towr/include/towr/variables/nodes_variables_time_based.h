@@ -100,7 +100,7 @@ public:
    * @param variable_id  Name of this variables set in the optimization.
    * @param dT discretization time. Should exactly match discretization time of coresponding TimeBasedConstraint.
    */
-  NodesVariablesEEForceTimeBased(const VecTimes& phase_durations, bool first_phase_contact, std::string variable_id, double dT);
+  NodesVariablesEEForceTimeBased(const VecTimes& phase_durations, bool first_phase_contact, std::string variable_id, double dT, int n_dim = k3D);
   virtual ~NodesVariablesEEForceTimeBased () = default;
 
   /**
