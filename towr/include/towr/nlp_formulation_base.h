@@ -27,68 +27,84 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef TOWR_NLP_FACTORY_H_
-#define TOWR_NLP_FACTORY_H_
+#ifndef TOWR_NLP_FACTORY_BASE_H_
+#define TOWR_NLP_FACTORY_BASE_H_
 
-#include <towr/nlp_formulation_base.h>
+#include <ifopt/variable_set.h>
+#include <ifopt/constraint_set.h>
+#include <ifopt/cost_term.h>
+
+#include <towr/variables/spline_holder.h>
+#include <towr/models/robot_model.h>
+#include <towr/terrain/height_map.h>
+#include <towr/parameters.h>
 
 namespace towr {
 
+/**
+ * @defgroup Constraints
+ * @brief Constraints of the trajectory optimization problem.
+ *
+ * These are the constraint sets that characterize legged locomotion.
+ *
+ * Folder: @ref include/towr/constraints
+ */
+
+/**
+ * @defgroup Costs
+ * @brief Costs of the trajectory optimization problem.
+ *
+ * These the the cost terms that prioritize certain solutions to the
+ * legged locomotion problem.
+ *
+ * Folder: @ref include/towr/costs
+ */
 
 /**
  *
- * @brief 6D optimization problem.
+ * @brief A sample combination of variables, cost and constraints.
  *
+ * This is _one_ example of how to combine the variables, constraints and costs
+ * provided by this library. Additional variables or constraints can be added
+ * to the NLP, or existing elements replaced to find a more powerful/general
+ * formulation. This formulation was used to generate the motions described
+ * in this paper: https://ieeexplore.ieee.org/document/8283570/
  */
-class NlpFormulation : public NlpFormulationBase {
+class NlpFormulationBase {
 public:
-  NlpFormulation ();
-  virtual ~NlpFormulation () = default;
+  using VariablePtrVec   = std::vector<ifopt::VariableSet::Ptr>;
+  using ContraintPtr     = ifopt::ConstraintSet::Ptr;
+  using ContraintPtrVec  = std::vector<ifopt::ConstraintSet::Ptr>;
+  using CostPtrVec       = std::vector<ifopt::CostTerm::Ptr>;
+  using EEPos            = std::vector<Eigen::Vector3d>;
+  using Vector3d         = Eigen::Vector3d;
+
+  virtual ~NlpFormulationBase () {};
 
   /**
    * @brief The ifopt variable sets that will be optimized over.
    * @param[in/out] builds fully-constructed splines from the variables.
    */
-  VariablePtrVec GetVariableSets(SplineHolder& spline_holder);
+  virtual VariablePtrVec GetVariableSets(SplineHolder& spline_holder) = 0;
 
   /**
    * @brief The ifopt constraints that enforce feasible motions.
    * @param[in] uses the fully-constructed splines for initialization of constraints.
    */
-  ContraintPtrVec GetConstraints(const SplineHolder& spline_holder) const;
+  virtual ContraintPtrVec GetConstraints(const SplineHolder& spline_holder) const = 0;
 
   /** @brief The ifopt costs to tune the motion. */
-  ContraintPtrVec GetCosts(const SplineHolder& s) const;
+  virtual ContraintPtrVec GetCosts(const SplineHolder& s) const = 0;
 
-private:
-  // variables
-  std::vector<NodesVariables::Ptr> MakeBaseVariables() const;
-  std::vector<NodesVariablesPhaseBased::Ptr> MakeEndeffectorVariables() const;
-  std::vector<NodesVariablesTimeBased::Ptr> MakeForceVariables() const;
-  std::vector<PhaseDurations::Ptr> MakeContactScheduleVariables() const;
-
-  // constraints
-  ContraintPtrVec GetConstraint(Parameters::ConstraintName name,
-                                const SplineHolder& splines) const;
-  ContraintPtrVec MakeDynamicConstraint(const SplineHolder& s) const;
-  ContraintPtrVec MakeRangeOfMotionConstraint(const SplineHolder& s) const;
-  ContraintPtrVec MakeRangeOfMotionSphericalConstraint (const SplineHolder& s) const;
-  ContraintPtrVec MakeTotalTimeConstraint() const;
-  ContraintPtrVec MakeTerrainConstraint() const;
-  ContraintPtrVec MakeForceConstraint() const;
-  ContraintPtrVec MakeSwingConstraint() const;
-  ContraintPtrVec MakeBaseRangeOfMotionConstraint(const SplineHolder& s) const;
-  ContraintPtrVec MakeBaseAccConstraint(const SplineHolder& s) const;
-
-  // costs
-  CostPtrVec GetCost(const Parameters::CostName& id, double weight, const SplineHolder& s) const;
-  CostPtrVec MakeForcesCost(double weight) const;
-  CostPtrVec MakeEEMotionCost(double weight) const;
-  CostPtrVec MakeBaseLinMotionCost(double weight) const;
-  CostPtrVec MakeBaseAngMotionCost(double weight) const;
-  CostPtrVec MakeEEAccCost(double weight, const SplineHolder& s) const;
+  BaseState initial_base_;
+  BaseState final_base_;
+  EEPos  initial_ee_W_;
+  EEPos  final_ee_W_;
+  RobotModel model_;
+  HeightMap::Ptr terrain_;
+  Parameters params_;
 };
 
 } /* namespace towr */
 
-#endif /* TOWR_NLP_FACTORY_H_ */
+#endif /* TOWR_NLP_FACTORY_BASE_H_ */

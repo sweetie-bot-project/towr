@@ -19,10 +19,12 @@ set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
 add_library(${PROJECT_NAME} SHARED
   # sample formulation usage
   src/nlp_formulation.cc
+  src/nlp_formulation_planar.cc
   src/parameters.cc
   # variables
   src/nodes_variables.cc
   src/nodes_variables_all.cc
+  src/nodes_variables_partial.cc
   src/nodes_variables_phase_based.cc
   src/nodes_variables_time_based.cc
   src/phase_durations.cc
@@ -43,6 +45,11 @@ add_library(${PROJECT_NAME} SHARED
   src/range_of_motion_spherical_constraint.cc
   src/spline_acc_constraint.cc
   src/linear_constraint.cc
+  # constraints planar
+  src/force_planar_constraint.cc
+  src/dynamic_planar_constraint.cc
+  src/range_of_motion_planar_constraint.cc
+  src/range_of_motion_spherical_planar_constraint.cc
   # costs
   src/node_cost.cc
   src/accel_square_norm_cost.cc

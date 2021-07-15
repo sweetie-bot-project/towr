@@ -27,23 +27,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
-#ifndef TOWR_NLP_FACTORY_H_
-#define TOWR_NLP_FACTORY_H_
+#ifndef TOWR_NLP_FACTORY_PLANAR_H_
+#define TOWR_NLP_FACTORY_PLANAR_H_
 
 #include <towr/nlp_formulation_base.h>
 
 namespace towr {
 
-
 /**
  *
- * @brief 6D optimization problem.
+ * @brief Planar NLP formulation.
  *
  */
-class NlpFormulation : public NlpFormulationBase {
+class NlpFormulationPlanar : public NlpFormulationBase {
 public:
-  NlpFormulation ();
-  virtual ~NlpFormulation () = default;
+  NlpFormulationPlanar ();
+  virtual ~NlpFormulationPlanar () = default;
 
   /**
    * @brief The ifopt variable sets that will be optimized over.
@@ -65,7 +64,7 @@ private:
   std::vector<NodesVariables::Ptr> MakeBaseVariables() const;
   std::vector<NodesVariablesPhaseBased::Ptr> MakeEndeffectorVariables() const;
   std::vector<NodesVariablesTimeBased::Ptr> MakeForceVariables() const;
-  std::vector<PhaseDurations::Ptr> MakeContactScheduleVariables() const;
+  std::vector<PhaseDurations::Ptr> MakeContactScheduleVariables () const;
 
   // constraints
   ContraintPtrVec GetConstraint(Parameters::ConstraintName name,
@@ -77,8 +76,6 @@ private:
   ContraintPtrVec MakeTerrainConstraint() const;
   ContraintPtrVec MakeForceConstraint() const;
   ContraintPtrVec MakeSwingConstraint() const;
-  ContraintPtrVec MakeBaseRangeOfMotionConstraint(const SplineHolder& s) const;
-  ContraintPtrVec MakeBaseAccConstraint(const SplineHolder& s) const;
 
   // costs
   CostPtrVec GetCost(const Parameters::CostName& id, double weight, const SplineHolder& s) const;
