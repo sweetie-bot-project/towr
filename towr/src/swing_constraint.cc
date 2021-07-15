@@ -72,7 +72,11 @@ SwingConstraint::GetValues () const
 
     Vector2d distance_xy    = next - prev;
     Vector2d xy_center      = prev + 0.5*distance_xy;
-    Vector2d des_vel_center = distance_xy/t_swing_avg_; // linear interpolation not accurate
+    // NOTE: l --- distance, T --- duration.
+	// vel = l/T --- minimal maximal speed during movement (4l/3T)
+	// vel = 2*l/T --- minimal acceleration, maximal speed (2l/T)
+	// vel = 3/2*l/T --- positive acceleration, minimal maximal speed (3l/2T)
+    Vector2d des_vel_center = distance_xy/t_swing_avg_; 
     for (auto dim : {X,Y}) {
       g(row++) = curr.p()(dim) - xy_center(dim);
       g(row++) = curr.v()(dim) - des_vel_center(dim);
